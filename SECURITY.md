@@ -23,11 +23,18 @@ Cada versión publicada se compila en GitHub Actions y trae:
 
 - Imagen Docker en `ghcr.io/mubeira0/portero-proxy` con su propia atestación.
 
+## Actualizaciones y copias
+
+- Las actualizaciones desde el panel exigen la **contraseña** (y el código 2FA si lo tienes), verifican la **firma Ed25519** de `SHA256SUMS` con una clave pública incrustada en el programa y comprueban el SHA256 del paquete. Un servicio aparte (root, solo para esto) **vuelve a verificarlo todo** antes de instalar, y si la versión nueva no arranca restaura la anterior.
+- El panel solo consulta la página de versiones de GitHub; no envía datos de tu instalación. Se puede desactivar en Sistema.
+- Las copias automáticas van **cifradas** (PBKDF2-HMAC-SHA256 + AES-256-GCM); sin la frase de paso no se pueden abrir y cualquier alteración se detecta.
+
 ## Protección del propio programa
 
 - Portero se distribuye **solo compilado** (binario estático sin símbolos ni rutas de compilación). El código fuente no se publica.
 - La licencia (`LICENSE`) **no permite modificarlo, descompilarlo ni redistribuirlo**.
 - Un binario alterado se detecta: no coincidirá con `SHA256SUMS` ni con la atestación firmada, y el instalador se negará a instalarlo.
+- Los archivos de la interfaz (HTML, JS, CSS) van **cifrados y comprimidos dentro del binario** y se descifran solo en memoria.
 - Ningún programa distribuido puede ser matemáticamente inmune a la ingeniería inversa; la protección real es la combinación de no publicar el código, la licencia y la verificación de integridad.
 
 ## Recomendaciones

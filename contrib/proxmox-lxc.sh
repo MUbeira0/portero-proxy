@@ -52,7 +52,7 @@ for _ in $(seq 1 60); do
 done
 
 echo "==> Instalando Portero"
-pct exec "$CTID" -- sh -c 'apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates >/dev/null'
+pct exec "$CTID" -- sh -c 'apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl ca-certificates openssl >/dev/null'
 if [ -n "${INSTALL_SH:-}" ]; then
   pct push "$CTID" "$INSTALL_SH" /root/install.sh
   # shellcheck disable=SC2086

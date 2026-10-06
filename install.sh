@@ -11,6 +11,7 @@
 #   --from-file RUTA   usa un binario o .tar.gz que ya tienes (sin descargar; para equipos sin internet)
 #   --no-start         instala pero no arranca el servicio
 #   --yes              no pregunta nada
+#   --skip-signature   no exige la firma de SHA256SUMS (NO recomendado)
 #
 # Qué hace: descarga la versión publicada, comprueba su SHA256 (y su procedencia con `gh attestation verify`
 # si tienes GitHub CLI), crea el usuario sin privilegios «portero», instala el binario en /usr/local/bin,
@@ -21,9 +22,15 @@ REPO="${PORTERO_REPO:-MUbeira0/portero-proxy}"
 BIN=/usr/local/bin/portero
 CONF_DIR=/etc/portero
 UNIT=/etc/systemd/system/portero.service
+UPD_PATH=/etc/systemd/system/portero-update.path
+UPD_UNIT=/etc/systemd/system/portero-update.service
+# Clave pública con la que se firman las versiones oficiales (Ed25519)
+RELEASE_PUB='-----BEGIN PUBLIC KEY-----
+MCowBQYDK2VwAyEAcCftl8zGs6fXlOV1oF90qUgYz6teP0OChssJe/pN2y4=
+-----END PUBLIC KEY-----'
 SVC_USER=portero
 
-VERSION=""; ACTION=install; PURGE=0; FROM_FILE=""; START=1; YES=0
+VERSION=""; ACTION=install; PURGE=0; FROM_FILE=""; START=1; YES=0; SKIP_SIG=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --version) VERSION="${2:-}"; shift 2 ;;
@@ -33,6 +40,7 @@ while [ $# -gt 0 ]; do
     --from-file) FROM_FILE="${2:-}"; shift 2 ;;
     --no-start) START=0; shift ;;
     --yes|-y) YES=1; shift ;;
+    --skip-signature) SKIP_SIG=1; shift ;;
     -h|--help) sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "Opción desconocida: $1 (usa --help)" >&2; exit 2 ;;
   esac
@@ -54,8 +62,9 @@ stop_service() { systemctl stop portero >/dev/null 2>&1 || true; }
 
 if [ "$ACTION" = uninstall ]; then
   say "Desinstalando Portero"
+  systemctl disable --now portero-update.path >/dev/null 2>&1 || true
   systemctl disable --now portero >/dev/null 2>&1 || true
-  rm -f "$UNIT" "$BIN"
+  rm -f "$UNIT" "$UPD_PATH" "$UPD_UNIT" "$BIN" "$BIN.prev"
   systemctl daemon-reload
   if [ "$PURGE" -eq 1 ]; then
     if [ "$YES" -ne 1 ] && [ -t 0 ]; then
@@ -105,6 +114,22 @@ else
   say "Descargando Portero $VERSION ($ARCH)"
   dl "$BASE/$FILE" "$TMP/$FILE" || die "No se pudo descargar $BASE/$FILE"
   dl "$BASE/SHA256SUMS" "$TMP/SHA256SUMS" || die "No se pudo descargar SHA256SUMS"
+  if [ "$SKIP_SIG" -eq 1 ]; then
+    warn "Firma de SHA256SUMS omitida por --skip-signature."
+  else
+    dl "$BASE/SHA256SUMS.sig" "$TMP/SHA256SUMS.sig" || die "Esta versión no tiene firma (SHA256SUMS.sig). No se instala; usa --skip-signature solo si sabes lo que haces."
+    if ! command -v openssl >/dev/null 2>&1 && command -v apt-get >/dev/null 2>&1; then
+      DEBIAN_FRONTEND=noninteractive apt-get install -y -qq openssl >/dev/null 2>&1 || true
+    fi
+    command -v openssl >/dev/null 2>&1 || die "Hace falta openssl para comprobar la firma (apt install openssl)."
+    printf '%s\n' "$RELEASE_PUB" > "$TMP/release.pub"
+    if openssl pkeyutl -verify -pubin -inkey "$TMP/release.pub" -rawin -in "$TMP/SHA256SUMS" -sigfile "$TMP/SHA256SUMS.sig" >/dev/null 2>&1 \
+      || openssl pkeyutl -verify -pubin -inkey "$TMP/release.pub" -in "$TMP/SHA256SUMS" -sigfile "$TMP/SHA256SUMS.sig" >/dev/null 2>&1; then
+      ok "Firma de MilServices correcta"
+    else
+      die "La FIRMA de SHA256SUMS no es válida: este paquete no es una versión oficial. No se instala."
+    fi
+  fi
   EXPECT="$(grep " $FILE\$" "$TMP/SHA256SUMS" | awk '{print $1}')"
   [ -n "$EXPECT" ] || die "$FILE no aparece en SHA256SUMS"
   GOT="$(sha256sum "$TMP/$FILE" | awk '{print $1}')"
@@ -190,8 +215,36 @@ UMask=0077
 WantedBy=multi-user.target
 EOF
 chmod 644 "$UNIT"
+
+# Servicio que aplica las actualizaciones que el panel deja preparadas (verifica de nuevo la firma, instala y reinicia)
+cat > "$UPD_UNIT" <<'EOF'
+[Unit]
+Description=Portero · aplicar actualización preparada desde el panel
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/local/bin/portero apply-update -c /etc/portero/portero.json
+ProtectSystem=strict
+ReadWritePaths=/usr/local/bin /etc/portero
+ProtectHome=true
+PrivateTmp=true
+EOF
+cat > "$UPD_PATH" <<'EOF'
+[Unit]
+Description=Portero · vigilar actualizaciones preparadas
+
+[Path]
+PathExists=/etc/portero/update/ready
+Unit=portero-update.service
+
+[Install]
+WantedBy=multi-user.target
+EOF
+chmod 644 "$UPD_UNIT" "$UPD_PATH"
 systemctl daemon-reload
 systemctl enable portero >/dev/null 2>&1
+systemctl enable --now portero-update.path >/dev/null 2>&1 || warn "No se pudo activar portero-update.path (las actualizaciones desde el panel no estarán disponibles)."
 
 if [ "$START" -eq 0 ]; then ok "Instalado. Arranca con: systemctl start portero"; exit 0; fi
 systemctl restart portero

@@ -41,6 +41,13 @@ By **MilServices** · Licencia: software propietario gratuito (ver LICENSE) · [
 
 **DDNS**: Portero averigua tu IP pública (en varios servicios a la vez; deben coincidir al menos dos, y se rechazan IPs privadas y de CGNAT) y mantiene al día los registros que indiques en **Cloudflare** (A/AAAA, con o sin proxy), **DuckDNS**, cualquier servicio **DynDNS2** (No-IP, Dynu…) o un **webhook**. Avisa de los cambios de IP y de los fallos, y el diagnóstico lo revisa.
 
+**Sistema** (página «Sistema» del panel)
+- **Actualizaciones desde el panel**: avisa de las versiones nuevas y las instala con un botón. Cada versión se verifica con una **firma Ed25519 de MilServices** y su SHA256 antes de instalarse; si la nueva no arranca, se restaura la anterior. (En Docker: `docker compose pull && docker compose up -d`.)
+- **Copias automáticas cifradas** (AES-256-GCM con tu frase de paso) de la configuración, claves y certificados: carpeta local con rotación y, si quieres, subida a un **WebDAV** (Nextcloud, NAS…). Se restauran con `portero restore`.
+- **Importar sitios** desde **Nginx** (también los archivos de **Nginx Proxy Manager**) y **Caddyfile**: pegas el archivo y Portero crea los sitios.
+- **HTTP/3 (QUIC)** opcional por entrada con HTTPS, y **IPv6** (entradas y servidores en `[::1]:80`, redes IPv6 permitidas).
+- **Licencia**: Portero es gratuito y lo incluye todo; la edición de pago futura se activará con una clave firmada que se comprueba sin conexión.
+
 **DNS automático**: al publicar un sitio, Portero crea el nombre en tu **AdGuard Home** (reescrituras DNS), en **Cloudflare** (registro A) o por **webhook**, comprueba si el nombre resuelve a esta máquina y puede borrar los registros al quitar el sitio.
 
 **Módulos instalables**
@@ -166,6 +173,20 @@ Ejemplo mínimo:
 - `rate_limit` (por entrada): `requests` = ritmo y tamaño de la ráfaga, `per_seconds` = periodo; con `ban_minutes` la IP se bloquea ese tiempo si supera el ritmo en `ban_after` periodos distintos de los últimos 10 minutos. Las redes de confianza quedan fuera.
 - Regla con `"limit": {"requests": 10, "per_seconds": 60}`: límite solo para esa regla. Regla con `"maintenance": "mensaje"`: página de mantenimiento.
 - `logging.stdout` escribe cada petición en el diario de systemd (desactivado por defecto); `logging.file` guarda una línea JSON por petición con rotación.
+
+### Actualizaciones, copias y HTTP/3
+
+```json
+{
+  "updates": { "check": true },
+  "backup": { "enabled": true, "every_hours": 24, "keep": 7, "dir": "copias", "passphrase": "una frase larga", "webdav_url": "https://nube.midominio.com/remote.php/dav/files/yo/Portero", "webdav_user": "yo", "webdav_password": "..." },
+  "frontends": [ { "name": "seguro", "bind": "[::]:443", "tls": { "certs": ["casa"] }, "http3": true } ]
+}
+```
+
+- `http3: true` abre también el puerto **UDP** de la entrada (déjalo pasar en tu cortafuegos) y anuncia `Alt-Svc`. Solo con TLS.
+- Restaurar una copia: `PORTERO_BACKUP_PASSPHRASE='tu frase' portero restore copia.pbk --to /etc/portero --force` (y reiniciar el servicio).
+- Comprobar una licencia: `portero license verify <clave>`.
 
 ### Condiciones
 
