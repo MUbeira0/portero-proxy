@@ -1,0 +1,140 @@
+name: Publicar versión
+# Este flujo vive en el repositorio PÚBLICO (portero-proxy). Compila el código fuente PRIVADO con una
+# clave de despliegue de solo lectura (secreto SOURCE_DEPLOY_KEY) y publica solo los binarios.
+# El registro de compilación se oculta a propósito: el código no debe aparecer en registros públicos.
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: read
+env:
+  SOURCE_REPO: MUbeira0/portero
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            docker: amd64
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+            docker: arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: pub
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.SOURCE_REPO }}
+          ref: ${{ github.ref_name }}
+          ssh-key: ${{ secrets.SOURCE_DEPLOY_KEY }}
+          path: src
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq musl-tools
+      - name: Comprobar que la etiqueta coincide con la versión
+        run: |
+          V="$(sed -n 's/^version = "\(.*\)"/\1/p' src/Cargo.toml | head -n1)"
+          [ "v$V" = "$GITHUB_REF_NAME" ] || { echo "La etiqueta $GITHUB_REF_NAME no coincide con la versión $V"; exit 1; }
+      - name: Compilar (estático, musl; registro oculto)
+        working-directory: src
+        env:
+          RUSTFLAGS: "-A warnings --remap-path-prefix=${{ github.workspace }}/src=/build"
+        run: |
+          if ! cargo build --release --locked --target ${{ matrix.target }} >/dev/null 2>&1; then
+            echo "::error::La compilación falló (el registro se oculta porque el código es privado; reprodúcelo en el repositorio privado)"
+            exit 1
+          fi
+      - name: Empaquetar
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          D="portero-${VERSION}-linux-${{ matrix.arch }}"
+          mkdir -p "$D" dist
+          cp "src/target/${{ matrix.target }}/release/portero" "$D/"
+          cp pub/README.md pub/LICENSE pub/SECURITY.md pub/CHANGELOG.md pub/install.sh "$D/"
+          tar -czf "dist/$D.tar.gz" "$D"
+          cp "src/target/${{ matrix.target }}/release/portero" "dist/portero-linux-${{ matrix.docker }}"
+          "src/target/${{ matrix.target }}/release/portero" version
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.arch }}
+          path: dist/*
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Sumas SHA256
+        working-directory: dist
+        run: |
+          sha256sum portero-*-linux-*.tar.gz > SHA256SUMS
+          cat SHA256SUMS
+      - name: Atestación de procedencia (SLSA)
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            dist/portero-*-linux-*.tar.gz
+            dist/portero-linux-*
+      - name: Crear la versión
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          NOTES="$(awk -v v="$VERSION" '$0 ~ "^## \\[?"v"\\]?" {f=1; next} f && /^## / {exit} f' CHANGELOG.md)"
+          cp install.sh dist/install.sh
+          gh release create "$GITHUB_REF_NAME" --title "Portero $VERSION" --notes "${NOTES:-Portero $VERSION}" dist/portero-*-linux-*.tar.gz dist/SHA256SUMS dist/install.sh
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - run: chmod +x dist/portero-linux-*
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        run: |
+          echo "repo=$(echo ghcr.io/${{ github.repository }} | tr A-Z a-z)" >> "$GITHUB_OUTPUT"
+          echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+      - id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.release
+          platforms: linux/amd64,linux/arm64
+          push: true
+          provenance: true
+          tags: |
+            ${{ steps.meta.outputs.repo }}:${{ steps.meta.outputs.version }}
+            ${{ steps.meta.outputs.repo }}:latest
+      - uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ steps.meta.outputs.repo }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true

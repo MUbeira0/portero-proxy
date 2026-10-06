@@ -1,0 +1,13 @@
+# Imagen de las versiones publicadas: usa los binarios ya compilados (y verificados) por el flujo de publicación.
+FROM alpine:3.20
+ARG TARGETARCH
+RUN apk add --no-cache ca-certificates tzdata && adduser -D -H -u 10001 portero && mkdir /data && chown portero /data
+COPY dist/portero-linux-${TARGETARCH} /usr/local/bin/portero
+USER portero
+WORKDIR /data
+ENV PORTERO_CONFIG=/data/portero.json
+EXPOSE 80 443 8404
+VOLUME /data
+HEALTHCHECK --interval=30s --timeout=3s CMD wget -q -O /dev/null http://127.0.0.1:8404/health || exit 1
+ENTRYPOINT ["/usr/local/bin/portero"]
+CMD ["run"]

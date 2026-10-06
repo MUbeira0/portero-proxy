@@ -1,0 +1,37 @@
+PORTERO — LICENCIA DE USO (SOFTWARE PROPIETARIO)
+Copyright (c) 2026 MilServices. Todos los derechos reservados.
+
+Portero se distribuye únicamente como programa compilado (binario). El código fuente es
+propiedad de MilServices y no se distribuye ni se licencia.
+
+1. CONCESIÓN. Se te concede una licencia gratuita, no exclusiva, intransferible y revocable para
+   instalar y usar Portero, sin modificarlo, en tus propios equipos, ya sea para uso personal
+   o dentro de tu organización.
+
+2. RESTRICCIONES. No puedes, ni permitir que otros lo hagan:
+   a) modificar, adaptar, alterar o crear obras derivadas del programa, de sus recursos
+      incrustados (interfaz, plantillas, módulos incluidos) o de sus mecanismos de seguridad;
+   b) descompilar, desensamblar, aplicar ingeniería inversa o intentar obtener el código
+      fuente, salvo en la medida en que la ley aplicable lo permita expresamente pese a esta
+      restricción;
+   c) eliminar o alterar avisos de propiedad, firmas o sumas de verificación;
+   d) redistribuir, vender, alquilar, sublicenciar ni ofrecer el programa como servicio a
+      terceros, ni publicar copias o versiones alteradas del mismo. Para compartirlo, remite a
+      la página oficial de descargas.
+
+3. VERIFICACIÓN. Las versiones oficiales se publican con suma SHA256 y atestación de
+   procedencia. Un binario que no pase esa verificación no es una versión oficial, no está
+   cubierto por esta licencia y no debe usarse.
+
+4. SIN GARANTÍA. EL PROGRAMA SE ENTREGA «TAL CUAL», SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O
+   IMPLÍCITA, INCLUIDAS LAS DE COMERCIABILIDAD, IDONEIDAD PARA UN FIN CONCRETO Y NO
+   INFRACCIÓN. EN NINGÚN CASO MILSERVICES SERÁ RESPONSABLE DE DAÑOS, PÉRDIDA DE DATOS O
+   INTERRUPCIONES DERIVADOS DEL USO DEL PROGRAMA.
+
+5. TERMINACIÓN. La licencia termina automáticamente si incumples estas condiciones. Entonces
+   debes dejar de usar el programa y eliminar todas las copias.
+
+---
+English summary: Portero is proprietary freeware distributed as a compiled binary only. You may
+install and use it unmodified; you may not modify, reverse engineer, redistribute or resell it.
+The software is provided "as is" without warranty.

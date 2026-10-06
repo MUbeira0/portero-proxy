@@ -1,0 +1,5 @@
+target
+.git
+test
+node_modules
+*.tgz
