@@ -23,6 +23,13 @@ Cada versión publicada se compila en GitHub Actions y trae:
 
 - Imagen Docker en `ghcr.io/mubeira0/portero-proxy` con su propia atestación.
 
+## Cuentas y roles
+
+- Roles: **administrador**, **operador** y **solo lectura**; los permisos los aplica el servidor en cada petición (no solo la interfaz) y una cuenta desactivada o borrada pierde sus sesiones al instante.
+- Las cuentas adicionales **no se pueden crear ni modificar desde la configuración general** (solo desde la página Usuarios, que exige la contraseña —y el código 2FA— de quien lo hace).
+- Cada cuenta tiene su propia verificación en dos pasos y sus códigos de recuperación; el propietario no puede borrarse ni degradarse.
+- Los inicios de sesión de cuentas inexistentes tardan lo mismo que los de cuentas reales (no se puede averiguar qué usuarios existen).
+
 ## Actualizaciones y copias
 
 - Las actualizaciones desde el panel exigen la **contraseña** (y el código 2FA si lo tienes), verifican la **firma Ed25519** de `SHA256SUMS` con una clave pública incrustada en el programa y comprueban el SHA256 del paquete. Un servicio aparte (root, solo para esto) **vuelve a verificarlo todo** antes de instalar, y si la versión nueva no arranca restaura la anterior.

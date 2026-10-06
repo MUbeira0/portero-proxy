@@ -1,5 +1,12 @@
 # Cambios
 
+## [0.3.1]
+- **Usuarios**: varias cuentas del panel con roles (administrador, operador, solo lectura), 2FA por cuenta, contraseñas restablecibles por un administrador, sesiones que se cierran al cambiar una cuenta y avisos de seguridad.
+- **Directorio de usuarios del portal**: se definen una vez y se usan con `@nombre` en sitios y reglas; importación de los usuarios escritos a mano.
+- **Portal de acceso más intuitivo**: botón mostrar/ocultar contraseña, aviso de mayúsculas, errores claros, página accesible directamente y tras cerrar sesión, bloqueo por intentos explicado en la propia página, tema claro/oscuro, título/mensaje/ayuda personalizables por sitio con vista previa, y selección de usuarios del directorio con casillas en el asistente de sitios y en las reglas.
+- Los intentos fallidos del portal de los sitios ya no bloquean el acceso al panel desde la misma IP.
+- Las actualizaciones nunca instalan una versión igual o anterior (protección contra repetir paquetes antiguos firmados).
+
 ## [0.3.0]
 - **Actualizaciones desde el panel** con firma Ed25519 + SHA256, reverificación por un servicio aparte y vuelta atrás si la nueva versión no arranca.
 - **Copias automáticas cifradas** (carpeta local con rotación y subida opcional a WebDAV) y `portero restore`.

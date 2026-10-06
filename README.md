@@ -41,6 +41,12 @@ By **MilServices** · Licencia: software propietario gratuito (ver LICENSE) · [
 
 **DDNS**: Portero averigua tu IP pública (en varios servicios a la vez; deben coincidir al menos dos, y se rechazan IPs privadas y de CGNAT) y mantiene al día los registros que indiques en **Cloudflare** (A/AAAA, con o sin proxy), **DuckDNS**, cualquier servicio **DynDNS2** (No-IP, Dynu…) o un **webhook**. Avisa de los cambios de IP y de los fallos, y el diagnóstico lo revisa.
 
+**Usuarios** (página «Usuarios»)
+- **Varias cuentas en el panel con roles**: *administrador* (todo), *operador* (mantenimiento: servidores, bloqueos, certificados, DDNS; sin cambiar la configuración) y *solo lectura*. Cada cuenta tiene su contraseña y su propia **verificación en dos pasos**; crear, editar o borrar cuentas pide tu contraseña, cierra las sesiones afectadas, queda en la auditoría y avisa por correo/Telegram.
+- **Directorio de usuarios del portal**: defines una vez a las personas que entran a los sitios protegidos y las eliges con `@nombre` en cada sitio o regla; cambiar su contraseña la cambia en todos. Puedes pasar al directorio los usuarios que ya tenías escritos a mano.
+
+**Portal de acceso a los sitios** (la página de inicio de sesión que ven tus visitantes): más clara y cómoda en móvil y ordenador, con botón para ver la contraseña, aviso de mayúsculas, mensajes de error útiles, «has cerrado sesión», aviso de bloqueo temporal con el formulario desactivado, recuerda a qué página ibas y se adapta al tema claro u oscuro. Cada sitio puede tener su **título, mensaje y texto de ayuda** propios y se ve una **vista previa** desde el panel. Para cerrar sesión: `/__portero/logout` en el propio sitio.
+
 **Sistema** (página «Sistema» del panel)
 - **Actualizaciones desde el panel**: avisa de las versiones nuevas y las instala con un botón. Cada versión se verifica con una **firma Ed25519 de MilServices** y su SHA256 antes de instalarse; si la nueva no arranca, se restaura la anterior. (En Docker: `docker compose pull && docker compose up -d`.)
 - **Copias automáticas cifradas** (AES-256-GCM con tu frase de paso) de la configuración, claves y certificados: carpeta local con rotación y, si quieres, subida a un **WebDAV** (Nextcloud, NAS…). Se restauran con `portero restore`.
@@ -187,6 +193,7 @@ Ejemplo mínimo:
 - `http3: true` abre también el puerto **UDP** de la entrada (déjalo pasar en tu cortafuegos) y anuncia `Alt-Svc`. Solo con TLS.
 - Restaurar una copia: `PORTERO_BACKUP_PASSPHRASE='tu frase' portero restore copia.pbk --to /etc/portero --force` (y reiniciar el servicio).
 - Comprobar una licencia: `portero license verify <clave>`.
+- En una regla, `"basic_auth": ["@marta", "pepe:clave"]` mezcla usuarios del directorio (`portal_users`) con usuarios escritos a mano.
 
 ### Condiciones
 
