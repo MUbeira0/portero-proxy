@@ -1,5 +1,8 @@
 # Cambios
 
+## [0.4.4]
+- **Seguridad (importante si publicas el panel por Portero)**: el panel ahora ve la IP real del visitante y no la del propio Portero. Antes, quien intentaba entrar desde internet aparecía con la IP local, así que unos pocos intentos fallidos de un atacante bloqueaban el inicio de sesión a todo el mundo (también a ti), y la auditoría y los avisos de «nuevo acceso» mostraban la IP equivocada. La cabecera que lo permite es propia, solo se envía al panel de esta máquina y el proxy descarta la que intente poner un cliente.
+
 ## [0.4.3]
 - **Diagnóstico**: la comprobación de DNS ahora compara el nombre con tu IP pública real. Si apunta a ella lo da por correcto (en verde) en vez de dejar un aviso; si es un nombre gestionado por el DDNS y no coincide, avisa de que está desactualizado.
 
