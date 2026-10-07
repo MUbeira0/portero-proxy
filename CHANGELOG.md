@@ -1,5 +1,10 @@
 # Cambios
 
+## [0.4.2]
+- **Arreglo importante del panel**: un error en la página de Seguridad (un selector mal escrito) hacía que, al activar la verificación en dos pasos, **no se mostraran los códigos de recuperación** (el 2FA sí quedaba activado), y que varios ajustes de esa página no se guardaran al editarlos. Arreglado, con una prueba que vigila que no vuelva a pasar.
+- **Códigos de recuperación nuevos**: botón en Seguridad (pide contraseña y un código actual de la aplicación; los anteriores dejan de valer).
+- **Seguridad**: la pantalla de bloqueo ya no enseña a los visitantes de fuera la nota interna de la regla (solo la ve la red local de confianza).
+
 ## [0.4.1]
 - **Revocar claves**: lista pública firmada de licencias revocadas que las instalaciones recogen solas (con caché sin conexión); `portero-tools revoke/unrevoke/issued` y `scripts/revoke-license.sh`.
 - Claves con **«exigir conexión»** (se bloquean si no se puede comprobar la lista), **atadas a un equipo** y con registro de lo emitido.
