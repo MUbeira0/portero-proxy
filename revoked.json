@@ -1,11 +1,5 @@
 {
-  "revoked": [
-    {
-      "at": 1791406037,
-      "id": "TEST-REV-1",
-      "reason": "prueba de revocacion"
-    }
-  ],
-  "updated": 1791406037,
+  "revoked": [],
+  "updated": 1791406367,
   "v": 1
 }
