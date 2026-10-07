@@ -1,5 +1,12 @@
 # Cambios
 
+## [0.4.1]
+- **Revocar claves**: lista pública firmada de licencias revocadas que las instalaciones recogen solas (con caché sin conexión); `portero-tools revoke/unrevoke/issued` y `scripts/revoke-license.sh`.
+- Claves con **«exigir conexión»** (se bloquean si no se puede comprobar la lista), **atadas a un equipo** y con registro de lo emitido.
+- **Arreglos de licencias**: la caducidad y la revocación ahora se aplican con el servicio en marcha (antes solo al reiniciar); retrasar el reloj o borrar las marcas ya no alarga una licencia; al activar o quitar una clave se regeneran al momento los clientes, la marca y los módulos Pro; el panel se refresca solo y muestra por qué una clave está bloqueada.
+- **Seguridad**: los destinos de los clientes se comprueban también al conectar (nombres que resuelven a esta máquina); un comodín no puede pisar los dominios de otro cliente; topes duros por cliente; el «HTTPS obligatorio» fijo ahora se aplica de verdad a todos sus sitios; los tokens ya no los lista un usuario de solo lectura.
+- Pruebas nuevas: licencias (12), matriz de permisos con todas las rutas y roles, y destinos prohibidos.
+
 ## [0.4.0]
 - **Edición Pro** con clave de licencia firmada (se comprueba sin conexión, con límites opcionales): la gratuita no cambia.
 - **Clientes aislados (multiempresa)**: espacio propio por cliente con sus sitios, certificados, usuarios del portal, registro y consumo; dominios, entradas y redes permitidas; **ajustes y sitios fijos** que el cliente no puede cambiar; cuotas; suspensión; cuentas de cliente con panel reducido.

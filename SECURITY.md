@@ -30,6 +30,13 @@ Cada versión publicada se compila en GitHub Actions y trae:
 - Cada cuenta tiene su propia verificación en dos pasos y sus códigos de recuperación; el propietario no puede borrarse ni degradarse.
 - Los inicios de sesión de cuentas inexistentes tardan lo mismo que los de cuentas reales (no se puede averiguar qué usuarios existen).
 
+## Licencias
+
+- Las claves van firmadas con Ed25519 y se comprueban sin conexión; no se pueden fabricar ni alterar. Pueden **caducar**, **atarse a un equipo** y exigir **conexión cada N días**.
+- **Revocación**: el propietario publica una lista de claves revocadas, también firmada. Las instalaciones la bajan solas (cada pocas horas), la guardan y la vuelven a verificar al arrancar; una lista falsa, alterada o más antigua que la que ya tienen se ignora. Una clave con «exigir conexión» se bloquea además si no se puede comprobar la lista en ese plazo, así que cortarle internet no la salva.
+- La licencia se reevalúa cada pocos minutos (caducidad, revocación, reloj). Retrasar el reloj no alarga una licencia; borrar las marcas de comprobación tampoco.
+- Límite honesto: quien controla su propio equipo y no tiene «exigir conexión» puede impedir que le llegue una revocación; por eso las claves de clientes deben emitirse con caducidad y/o «exigir conexión».
+
 ## Clientes (edición Pro)
 
 - Cada cuenta de cliente solo puede usar la interfaz de **su espacio** (/api/tenant); el servidor rechaza el resto aunque se pida a mano, y un cliente no puede pedir los datos de otro (el identificador viene siempre de su cuenta).
@@ -37,6 +44,8 @@ Cada versión publicada se compila en GitHub Actions y trae:
 - Los usuarios del portal de un cliente solo valen en los sitios de ese cliente; sus contraseñas se guardan con hash y nunca se muestran.
 - Los tokens de API se guardan solo como hash, se muestran una vez, caducan si quieres y se pueden revocar; un token nunca gestiona cuentas, tokens, licencia ni descarga copias completas.
 - El logo de la marca blanca se limpia (sin scripts ni referencias externas).
+- Los destinos de un cliente nunca pueden ser esta máquina ni la red de enlace local: se comprueba al escribirlos y otra vez **al conectar** (nombres que resuelven a 127.0.0.1, IPv4 mapeadas en IPv6…). Un comodín de un cliente no puede pisar el dominio de otro ni los tuyos.
+- Topes duros por cliente (sitios, servidores, dominios, usuarios, cabeceras) contra abusos.
 
 ## Actualizaciones y copias
 

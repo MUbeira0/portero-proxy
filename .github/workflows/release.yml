@@ -60,7 +60,9 @@ jobs:
           tar -czf "dist/$D.tar.gz" "$D"
           cp "src/target/${{ matrix.target }}/release/portero" "dist/portero-linux-${{ matrix.docker }}"
           # el modo de pruebas (PORTERO_DEV_PRO) solo existe en compilaciones de depuración: nunca debe estar en una versión publicada
-          if grep -aq PORTERO_DEV_PRO "src/target/${{ matrix.target }}/release/portero"; then echo "::error::la versión contiene el modo de pruebas"; exit 1; fi
+          for v in PORTERO_DEV_PRO PORTERO_DEV_LICENSE_PUB PORTERO_REVOCATION_URL PORTERO_LICENSE_TICK_SECS PORTERO_LICENSE_FETCH_SECS; do
+            if grep -aq "$v" "src/target/${{ matrix.target }}/release/portero"; then echo "::error::la versión contiene el modo de pruebas ($v)"; exit 1; fi
+          done
           "src/target/${{ matrix.target }}/release/portero" version
       - uses: actions/upload-artifact@v4
         with:

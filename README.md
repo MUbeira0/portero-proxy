@@ -48,7 +48,7 @@ By **MilServices** · Licencia: software propietario gratuito (ver LICENSE) · [
 - **Tokens de API** para automatizar (con rol y caducidad; nunca pueden gestionar cuentas, tokens ni licencia).
 - **Módulos Pro**: cortafuegos web (WAF), clave de API obligatoria, cabeceras de seguridad estrictas, límite de tamaño de subida, lista negra de IPs y tabla de redirecciones.
 - **Mantenimientos programados** por sitio (ventanas puntuales o semanales) y **exportar la auditoría** (CSV/JSON).
-- Se activa pegando la clave en Sistema → Licencia; se comprueba sin conexión.
+- Se activa pegando la clave en Sistema → Licencia. La firma se comprueba sin conexión; además Portero baja de vez en cuando una **lista pública y firmada de claves revocadas** (no envía nada tuyo). Una clave puede caducar, estar atada a un equipo, exigir conexión cada cierto tiempo o ser revocada: en esos casos vuelves a la edición gratuita al momento y se avisa. La licencia caducada o revocada **no rompe nada**: tus sitios siguen funcionando, solo se bloquean los cambios de las funciones Pro.
 
 **Usuarios** (página «Usuarios»)
 - **Varias cuentas en el panel con roles**: *administrador* (todo), *operador* (mantenimiento: servidores, bloqueos, certificados, DDNS; sin cambiar la configuración) y *solo lectura*. Cada cuenta tiene su contraseña y su propia **verificación en dos pasos**; crear, editar o borrar cuentas pide tu contraseña, cierra las sesiones afectadas, queda en la auditoría y avisa por correo/Telegram.
