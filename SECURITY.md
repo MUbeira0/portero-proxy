@@ -30,6 +30,14 @@ Cada versión publicada se compila en GitHub Actions y trae:
 - Cada cuenta tiene su propia verificación en dos pasos y sus códigos de recuperación; el propietario no puede borrarse ni degradarse.
 - Los inicios de sesión de cuentas inexistentes tardan lo mismo que los de cuentas reales (no se puede averiguar qué usuarios existen).
 
+## Clientes (edición Pro)
+
+- Cada cuenta de cliente solo puede usar la interfaz de **su espacio** (/api/tenant); el servidor rechaza el resto aunque se pida a mano, y un cliente no puede pedir los datos de otro (el identificador viene siempre de su cuenta).
+- Lo que sube un cliente se **valida entero** antes de aplicarse: dominios dentro de los permitidos y no usados por otro, destinos que no pueden ser esta máquina ni el panel (ni salirse de las redes que le hayas dado), cuotas, y campos desconocidos rechazados. Los ajustes **fijos** se aplican siempre y los sitios fijos no se pueden cambiar ni borrar.
+- Los usuarios del portal de un cliente solo valen en los sitios de ese cliente; sus contraseñas se guardan con hash y nunca se muestran.
+- Los tokens de API se guardan solo como hash, se muestran una vez, caducan si quieres y se pueden revocar; un token nunca gestiona cuentas, tokens, licencia ni descarga copias completas.
+- El logo de la marca blanca se limpia (sin scripts ni referencias externas).
+
 ## Actualizaciones y copias
 
 - Las actualizaciones desde el panel exigen la **contraseña** (y el código 2FA si lo tienes), verifican la **firma Ed25519** de `SHA256SUMS` con una clave pública incrustada en el programa y comprueban el SHA256 del paquete. Un servicio aparte (root, solo para esto) **vuelve a verificarlo todo** antes de instalar, y si la versión nueva no arranca restaura la anterior.

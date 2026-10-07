@@ -59,6 +59,8 @@ jobs:
           cp pub/README.md pub/LICENSE pub/SECURITY.md pub/CHANGELOG.md pub/install.sh "$D/"
           tar -czf "dist/$D.tar.gz" "$D"
           cp "src/target/${{ matrix.target }}/release/portero" "dist/portero-linux-${{ matrix.docker }}"
+          # el modo de pruebas (PORTERO_DEV_PRO) solo existe en compilaciones de depuración: nunca debe estar en una versión publicada
+          if grep -aq PORTERO_DEV_PRO "src/target/${{ matrix.target }}/release/portero"; then echo "::error::la versión contiene el modo de pruebas"; exit 1; fi
           "src/target/${{ matrix.target }}/release/portero" version
       - uses: actions/upload-artifact@v4
         with:

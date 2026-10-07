@@ -1,5 +1,10 @@
 # Cambios
 
+## [0.4.0]
+- **Edición Pro** con clave de licencia firmada (se comprueba sin conexión, con límites opcionales): la gratuita no cambia.
+- **Clientes aislados (multiempresa)**: espacio propio por cliente con sus sitios, certificados, usuarios del portal, registro y consumo; dominios, entradas y redes permitidas; **ajustes y sitios fijos** que el cliente no puede cambiar; cuotas; suspensión; cuentas de cliente con panel reducido.
+- **Consumo y cuotas mensuales** por cliente con informe CSV, **marca blanca** (global y por cliente), **tokens de API**, **6 módulos Pro** (WAF, clave de API, cabeceras estrictas, límite de tamaño, lista negra de IPs, redirecciones), **mantenimientos programados** y **exportar la auditoría**.
+
 ## [0.3.1]
 - **Usuarios**: varias cuentas del panel con roles (administrador, operador, solo lectura), 2FA por cuenta, contraseñas restablecibles por un administrador, sesiones que se cierran al cambiar una cuenta y avisos de seguridad.
 - **Directorio de usuarios del portal**: se definen una vez y se usan con `@nombre` en sitios y reglas; importación de los usuarios escritos a mano.

@@ -41,6 +41,15 @@ By **MilServices** · Licencia: software propietario gratuito (ver LICENSE) · [
 
 **DDNS**: Portero averigua tu IP pública (en varios servicios a la vez; deben coincidir al menos dos, y se rechazan IPs privadas y de CGNAT) y mantiene al día los registros que indiques en **Cloudflare** (A/AAAA, con o sin proxy), **DuckDNS**, cualquier servicio **DynDNS2** (No-IP, Dynu…) o un **webhook**. Avisa de los cambios de IP y de los fallos, y el diagnóstico lo revisa.
 
+**Edición Pro** (con clave de licencia; la edición gratuita incluye todo lo demás)
+- **Clientes aislados (multiempresa)**: cada cliente tiene su espacio con sus sitios, certificados, usuarios del portal, registro y consumo, y **no ve nada de los demás ni de tu configuración**. Tú le limitas los dominios, las entradas y las redes a las que puede apuntar, y le pones **cosas fijas** que no puede cambiar ni quitar: HTTPS obligatorio, límite de peticiones, rutas bloqueadas, cabeceras, solo red local, textos de la página de acceso y **sitios fijos** tuyos. También cuotas (sitios, servidores, usuarios), suspensión con un clic y cuentas de cliente con su propio panel reducido.
+- **Consumo y cuotas mensuales por cliente** (peticiones y tráfico), con informe CSV.
+- **Marca blanca**: tu nombre, lema, color y logo en la página de acceso, las pantallas de bloqueo y mantenimiento y el panel; cada cliente puede tener la suya.
+- **Tokens de API** para automatizar (con rol y caducidad; nunca pueden gestionar cuentas, tokens ni licencia).
+- **Módulos Pro**: cortafuegos web (WAF), clave de API obligatoria, cabeceras de seguridad estrictas, límite de tamaño de subida, lista negra de IPs y tabla de redirecciones.
+- **Mantenimientos programados** por sitio (ventanas puntuales o semanales) y **exportar la auditoría** (CSV/JSON).
+- Se activa pegando la clave en Sistema → Licencia; se comprueba sin conexión.
+
 **Usuarios** (página «Usuarios»)
 - **Varias cuentas en el panel con roles**: *administrador* (todo), *operador* (mantenimiento: servidores, bloqueos, certificados, DDNS; sin cambiar la configuración) y *solo lectura*. Cada cuenta tiene su contraseña y su propia **verificación en dos pasos**; crear, editar o borrar cuentas pide tu contraseña, cierra las sesiones afectadas, queda en la auditoría y avisa por correo/Telegram.
 - **Directorio de usuarios del portal**: defines una vez a las personas que entran a los sitios protegidos y las eliges con `@nombre` en cada sitio o regla; cambiar su contraseña la cambia en todos. Puedes pasar al directorio los usuarios que ya tenías escritos a mano.
@@ -193,6 +202,8 @@ Ejemplo mínimo:
 - `http3: true` abre también el puerto **UDP** de la entrada (déjalo pasar en tu cortafuegos) y anuncia `Alt-Svc`. Solo con TLS.
 - Restaurar una copia: `PORTERO_BACKUP_PASSPHRASE='tu frase' portero restore copia.pbk --to /etc/portero --force` (y reiniciar el servicio).
 - Comprobar una licencia: `portero license verify <clave>`.
+- Un cliente (Pro) se define en `tenants`: `{ "id": "acme", "name": "Acme", "domains": ["*.acme.com"], "quota": { "max_sites": 5, "monthly_requests": 1000000 }, "locked": { "force_https": true, "deny_paths": ["/admin"], "rate_limit": { "requests": 100, "per_seconds": 10 } }, "sites": [ … ] }`. Portero genera a partir de sus sitios los backends, reglas y certificados (con el prefijo `t-acme-`); no se editan a mano.
+- Un token de API se manda con `Authorization: Bearer ptk_…`.
 - En una regla, `"basic_auth": ["@marta", "pepe:clave"]` mezcla usuarios del directorio (`portal_users`) con usuarios escritos a mano.
 
 ### Condiciones
