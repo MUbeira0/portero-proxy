@@ -187,6 +187,10 @@ Ejemplo mínimo:
 
 - `rate_limit` (por entrada): `requests` = ritmo y tamaño de la ráfaga, `per_seconds` = periodo; con `ban_minutes` la IP se bloquea ese tiempo si supera el ritmo en `ban_after` periodos distintos de los últimos 10 minutos. Las redes de confianza quedan fuera.
 - Regla con `"limit": {"requests": 10, "per_seconds": 60}`: límite solo para esa regla. Regla con `"maintenance": "mensaje"`: página de mantenimiento.
+- `security.autoban` (activado por defecto): bloquea solas, en todo Portero (sitios, panel y portales), las IP que fallan `login_fails` veces el inicio de sesión, piden `scanner_hits` rutas de escáner (`/.env`, `/wp-login.php`… que acaban en error; se pueden añadir con `scanner_paths`) o provocan `error_hits` errores 404/400 en `window_secs`. Dura `minutes` y se duplica con cada reincidencia (máx. 7 días); un 0 apaga ese detector. Las IP de confianza no se bloquean, los bloqueos se guardan en `bans.json` y se avisa por los canales de notificación.
+- `security.geoip` (`{"enabled": true}`): Portero descarga cada mes la base gratuita DB-IP Lite (CC BY 4.0) a `geoip.csv.gz` y habilita en las condiciones `country(ES,PT)` y `country_not(ES)` (este último solo coincide si el país es conocido, así que nunca bloquea por ignorancia). El país se guarda en el registro y sale en Tráfico.
+- Por regla: `"security_headers": "basic" | "strict" | "off"` (cabeceras de seguridad que no pisan las del servidor), `"cache": {"ttl_seconds": 300, "max_item_kb": 2048}` (caché en memoria de respuestas GET 200 sin Authorization ni cookies, sin Set-Cookie y sin `private`/`no-store`; se ve con `X-Portero-Cache: HIT|MISS`) y, junto a `portal`, `"auth_panel": true` (+ `"auth_users": ["ana"]`) para entrar con las cuentas del panel y su 2FA.
+- Cuentas del panel: `expires` (fecha Unix) las hace temporales. Llaves de acceso (WebAuthn/passkeys, ES256) como alternativa al código de 6 cifras: se registran en Seguridad con HTTPS y un dominio, se guardan en `passkeys.json` y el código de 6 cifras sigue valiendo siempre.
 - `logging.stdout` escribe cada petición en el diario de systemd (desactivado por defecto); `logging.file` guarda una línea JSON por petición con rotación.
 
 ### Actualizaciones, copias y HTTP/3
@@ -208,7 +212,7 @@ Ejemplo mínimo:
 
 ### Condiciones
 
-`host() path() path_prefix() path_end() path_regex() method() header(nombre[=patrón]) query(clave[=patrón]) cookie(nombre[=patrón]) src(CIDR,…) tls sni() always`
+`host() path() path_prefix() path_end() path_regex() method() header(nombre[=patrón]) query(clave[=patrón]) cookie(nombre[=patrón]) src(CIDR,…) country(ES,…) country_not(ES,…) tls sni() always`
 
 Los patrones aceptan comodín `*`. En las redirecciones se pueden usar `{scheme} {host} {path} {query}`.
 

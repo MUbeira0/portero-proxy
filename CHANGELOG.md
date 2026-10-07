@@ -1,5 +1,16 @@
 # Cambios
 
+## [0.5.0]
+- **Bloqueo automático de IPs** (activado por defecto): bloquea solas, en todo Portero, las IP que fallan varias veces el inicio de sesión (panel o portales), piden rutas típicas de escáneres (`/.env`, `/wp-login.php`…) o provocan ráfagas de 404/400. El bloqueo se duplica con cada reincidencia, se guarda al reiniciar, avisa por tus canales y se gestiona en Seguridad. Tu red local y las IP de confianza nunca se bloquean. Los bloqueos manuales ahora valen para todo Portero.
+- **Países (GeoIP)**: base gratuita DB-IP Lite descargada y actualizada sola. Nuevas condiciones `country(ES)` y `country_not(ES)` (esta nunca bloquea si no se conoce el país). El país aparece en el Registro y se puede buscar por él.
+- **Tráfico**: página nueva con gráfica por sitio (48 h), errores 4xx/5xx, visitantes y rutas más frecuentes, y búsqueda en el registro de accesos (por texto, IP, dominio, país o código; en memoria o en el archivo del registro).
+- **Caché de contenido estático** por regla (en memoria, con `X-Portero-Cache`), solo para peticiones sin identificar; se vacía desde Tráfico.
+- **Cabeceras de seguridad** con un clic por regla («básicas» o «estrictas»).
+- **Cuentas del panel delante de cualquier sitio**: una regla con portal puede aceptar las cuentas del panel y su verificación en dos pasos, para poner un inicio de sesión seguro delante de apps que no tienen.
+- **Llaves de acceso (passkeys / WebAuthn)** como alternativa al código de 6 cifras (que sigue funcionando siempre): huella, cara, PIN del móvil o llave de seguridad. Se registran en Seguridad (HTTPS y un dominio).
+- **Avisos nuevos**: un sitio que devuelve errores 5xx en la mayoría de sus peticiones, entrada al panel desde un país nuevo, y cuando un cliente llega al 80 % de su cuota.
+- **Cuentas temporales**: fecha de caducidad en las cuentas del panel.
+
 ## [0.4.4]
 - **Seguridad (importante si publicas el panel por Portero)**: el panel ahora ve la IP real del visitante y no la del propio Portero. Antes, quien intentaba entrar desde internet aparecía con la IP local, así que unos pocos intentos fallidos de un atacante bloqueaban el inicio de sesión a todo el mundo (también a ti), y la auditoría y los avisos de «nuevo acceso» mostraban la IP equivocada. La cabecera que lo permite es propia, solo se envía al panel de esta máquina y el proxy descarta la que intente poner un cliente.
 
