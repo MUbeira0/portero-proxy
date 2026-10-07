@@ -1,5 +1,8 @@
 # Cambios
 
+## [0.4.3]
+- **Diagnóstico**: la comprobación de DNS ahora compara el nombre con tu IP pública real. Si apunta a ella lo da por correcto (en verde) en vez de dejar un aviso; si es un nombre gestionado por el DDNS y no coincide, avisa de que está desactualizado.
+
 ## [0.4.2]
 - **Arreglo importante del panel**: un error en la página de Seguridad (un selector mal escrito) hacía que, al activar la verificación en dos pasos, **no se mostraran los códigos de recuperación** (el 2FA sí quedaba activado), y que varios ajustes de esa página no se guardaran al editarlos. Arreglado, con una prueba que vigila que no vuelva a pasar.
 - **Códigos de recuperación nuevos**: botón en Seguridad (pide contraseña y un código actual de la aplicación; los anteriores dejan de valer).
