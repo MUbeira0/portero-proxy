@@ -1,5 +1,9 @@
 # Cambios
 
+## [0.6.1]
+- **Webs con mucho tráfico**: el bloqueo automático ya no cuenta como ataque los 404 de visitas con sesión (con cookie o Authorization): una app que consulta mucho no es un escáner. Nueva lista «Sitios que no se vigilan» (`skip_hosts`) para exentar dominios concretos. Las subidas grandes y lentas ya no se cortan por el tiempo de espera de la respuesta (se cuenta aparte, hasta 30 min).
+- **DDNS**: si cambias los ajustes de un registro (nube naranja de Cloudflare, TTL, IPv6, «Sustituir el CNAME») se actualiza en el proveedor aunque la IP no haya cambiado. Antes había que esperar hasta 6 horas.
+
 ## [0.6.0]
 - **Edición Pro**: las funciones de la 0.5 (bloqueo automático de IPs y avisos de ataques, países por IP, tráfico y búsqueda en el registro, caché, cabeceras de seguridad, cuentas del panel delante de los sitios, llaves de acceso, cuentas temporales y las dos ayudas para Cloudflare) pasan a ser funciones con licencia. Sin licencia quedan cerradas **sin dejar nada abierto**: una zona con «cuentas del panel» sigue protegida (nadie entra) y los países no bloquean a nadie. Los bloqueos manuales, el arreglo de la IP real en el panel y todo lo anterior siguen siendo gratuitos.
 - **Nodos (Pro)**: gestiona varios Porteros desde un solo panel. Añade otros Porteros en la página «Nodos» (dirección y un token de API creado en ellos, guardado cifrado) y elígelos en el selector de la cabecera: todas las páginas pasan a ser del Portero elegido. No se pueden gestionar desde fuera las cuentas, tokens, licencia, contraseñas ni actualizaciones de un nodo, y todo queda en la auditoría de los dos.
