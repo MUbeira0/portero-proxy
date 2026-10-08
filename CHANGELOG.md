@@ -1,5 +1,8 @@
 # Cambios
 
+## [0.5.1]
+- **DDNS con Cloudflare**: nueva opción «Sustituir el CNAME» en cada registro. Si el nombre ya existe como CNAME (por ejemplo, de un túnel de Cloudflare), Portero lo quita y crea el registro A con tu IP; el CNAME anterior queda anotado en el mensaje del registro por si hay que volver atrás. Sin la opción, avisa y no toca nada.
+
 ## [0.5.0]
 - **Bloqueo automático de IPs** (activado por defecto): bloquea solas, en todo Portero, las IP que fallan varias veces el inicio de sesión (panel o portales), piden rutas típicas de escáneres (`/.env`, `/wp-login.php`…) o provocan ráfagas de 404/400. El bloqueo se duplica con cada reincidencia, se guarda al reiniciar, avisa por tus canales y se gestiona en Seguridad. Tu red local y las IP de confianza nunca se bloquean. Los bloqueos manuales ahora valen para todo Portero.
 - **Países (GeoIP)**: base gratuita DB-IP Lite descargada y actualizada sola. Nuevas condiciones `country(ES)` y `country_not(ES)` (esta nunca bloquea si no se conoce el país). El país aparece en el Registro y se puede buscar por él.
