@@ -1,5 +1,8 @@
 # Cambios
 
+## [0.6.2]
+- **Diagnóstico y estado del DNS de los sitios**: ya no salen avisos falsos de «no resuelve». Portero comprobaba el DNS de todos los sitios a la vez y los DNS locales como AdGuard (que por defecto aceptan 20 consultas por segundo contando toda la red local junta) rechazaban la mitad. Ahora las consultas van espaciadas (unas 8 por segundo), se recuerdan 60 segundos y un fallo suelto se reintenta antes de darlo por malo.
+
 ## [0.6.1]
 - **Webs con mucho tráfico**: el bloqueo automático ya no cuenta como ataque los 404 de visitas con sesión (con cookie o Authorization): una app que consulta mucho no es un escáner. Nueva lista «Sitios que no se vigilan» (`skip_hosts`) para exentar dominios concretos. Las subidas grandes y lentas ya no se cortan por el tiempo de espera de la respuesta (se cuenta aparte, hasta 30 min).
 - **DDNS**: si cambias los ajustes de un registro (nube naranja de Cloudflare, TTL, IPv6, «Sustituir el CNAME») se actualiza en el proveedor aunque la IP no haya cambiado. Antes había que esperar hasta 6 horas.
