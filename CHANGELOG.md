@@ -1,5 +1,8 @@
 # Cambios
 
+## [0.5.2]
+- **Cloudflare en modo «Flexible»**: si la conexión llega desde un proxy de confianza (tus rangos de Cloudflare en `trusted_proxies`) y su cabecera `CF-Visitor` dice que el visitante usó HTTPS, Portero lo trata como HTTPS. Antes la entrada del puerto 80 lo mandaba a HTTPS una y otra vez (bucle de redirección). De fuera de los proxies de confianza no se cree la cabecera.
+
 ## [0.5.1]
 - **DDNS con Cloudflare**: nueva opción «Sustituir el CNAME» en cada registro. Si el nombre ya existe como CNAME (por ejemplo, de un túnel de Cloudflare), Portero lo quita y crea el registro A con tu IP; el CNAME anterior queda anotado en el mensaje del registro por si hay que volver atrás. Sin la opción, avisa y no toca nada.
 
