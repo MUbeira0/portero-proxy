@@ -1,5 +1,8 @@
 # Cambios
 
+## [0.6.3]
+- **Diagnóstico**: los sitios publicados por Cloudflare con la nube naranja ya no salen como «apunta a otra IP». Su DNS devuelve las IPs de Cloudflare a propósito; ahora se reconocen y se resumen como correctos (y avisa solo si un sitio marcado con la nube naranja deja de resolver a Cloudflare).
+
 ## [0.6.2]
 - **Diagnóstico y estado del DNS de los sitios**: ya no salen avisos falsos de «no resuelve». Portero comprobaba el DNS de todos los sitios a la vez y los DNS locales como AdGuard (que por defecto aceptan 20 consultas por segundo contando toda la red local junta) rechazaban la mitad. Ahora las consultas van espaciadas (unas 8 por segundo), se recuerdan 60 segundos y un fallo suelto se reintenta antes de darlo por malo.
 
