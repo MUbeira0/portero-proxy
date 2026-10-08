@@ -1,5 +1,8 @@
 # Cambios
 
+## [0.6.4]
+- **Arreglo importante de la interfaz Pro**: con licencia activa, las páginas y campos de las funciones Pro (Tráfico, bloqueo automático, países, llaves de acceso, cabeceras, caché, cuentas del panel en sitios, cuentas temporales, sustituir CNAME) seguían saliendo bloqueados («Función Pro: se activa con una licencia») porque la comprobación de licencia de la interfaz no llegaba a las demás páginas. También recupera el campo «Mantenimiento programado» de las reglas, que estaba oculto por lo mismo. Con una prueba nueva para que no vuelva a pasar.
+
 ## [0.6.3]
 - **Diagnóstico**: los sitios publicados por Cloudflare con la nube naranja ya no salen como «apunta a otra IP». Su DNS devuelve las IPs de Cloudflare a propósito; ahora se reconocen y se resumen como correctos (y avisa solo si un sitio marcado con la nube naranja deja de resolver a Cloudflare).
 
