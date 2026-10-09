@@ -1,5 +1,8 @@
 # Cambios
 
+## [0.6.6]
+- **Arreglo del botón «Mantenimiento» de los sitios**: ponía la página de mantenimiento solo en la entrada HTTPS del sitio. Los sitios detrás de Cloudflare en modo Flexible entran por el puerto 80 (regla «host(x) and header(cf-visitor…)»), así que sus visitantes se la saltaban y veían el sitio normal. Ahora se añade delante de todas las reglas del sitio, en todas las entradas. Además el cuadro avisa de que, con «Dejar pasar a la red local» marcado, quien prueba desde casa sigue viendo el sitio normal.
+
 ## [0.6.5]
 - **Categorías en «Sitios»**: ordena y filtra tus sitios por categoría (Domótica, Multimedia, Administración… las que quieras). La página gana buscador, filtros por categoría y por estado (en línea, con problemas, con login, solo red local), grupos que se pliegan, el botón 🏷 en cada sitio, «✨ Sugerir categorías» (propone una según el nombre; tú decides) y «🏷 Categorías» para renombrarlas. También hay campo de categoría en el asistente de sitio. Es solo organización: no cambia cómo se publica ningún sitio. El resumen de «Aplicar cambios» ahora cuenta también estos cambios.
 
