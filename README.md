@@ -240,3 +240,7 @@ fn on_request(req, cfg) {
 ### Varios Porteros desde un panel (Pro)
 
 `"nodes": [{ "id": "pve", "name": "Nodo pve", "url": "http://192.168.2.133:8404", "token": "ptk_…" }]` (el token se guarda cifrado; se crea en el otro Portero con rol de administrador). En el panel, la página **Nodos** administra la lista y el selector de la cabecera cambia a qué Portero hablan todas las páginas: el panel reenvía las peticiones a `/api/nodes/<id>/api/…`. Nunca se reenvían cuentas, tokens, licencia, contraseñas, 2FA, actualizaciones ni copia completa, y los tokens de API no pueden usar los nodos.
+
+### Páginas de estado públicas (Pro)
+
+`"status_pages": [{ "id": "estado", "title": "Estado de mis servicios", "host": "estado.midominio.com", "notice": "", "items": [{ "label": "Fotos", "backend": "fotos", "host": "fotos.midominio.com" }] }]`. Portero sirve esa página él mismo en `host` (sin comodines; necesita DNS y certificado como cualquier sitio), antes de las reglas y sin contraseña, y además `/status.json`. Solo se publican los nombres (`label`) y los estados; nunca backends ni direcciones. Con `host` en un elemento, Portero pide cada minuto `GET path` (por defecto `/`) a ese backend con ese dominio y lo da por activo si no responde 5xx; sin `host` se usa la salud del backend. El historial (30 días) sale de `availability.log`. Sin licencia no se sirve. En el panel: página **Estado público**.
