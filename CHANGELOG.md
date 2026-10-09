@@ -1,5 +1,8 @@
 # Cambios
 
+## [0.6.5]
+- **Categorías en «Sitios»**: ordena y filtra tus sitios por categoría (Domótica, Multimedia, Administración… las que quieras). La página gana buscador, filtros por categoría y por estado (en línea, con problemas, con login, solo red local), grupos que se pliegan, el botón 🏷 en cada sitio, «✨ Sugerir categorías» (propone una según el nombre; tú decides) y «🏷 Categorías» para renombrarlas. También hay campo de categoría en el asistente de sitio. Es solo organización: no cambia cómo se publica ningún sitio. El resumen de «Aplicar cambios» ahora cuenta también estos cambios.
+
 ## [0.6.4]
 - **Arreglo importante de la interfaz Pro**: con licencia activa, las páginas y campos de las funciones Pro (Tráfico, bloqueo automático, países, llaves de acceso, cabeceras, caché, cuentas del panel en sitios, cuentas temporales, sustituir CNAME) seguían saliendo bloqueados («Función Pro: se activa con una licencia») porque la comprobación de licencia de la interfaz no llegaba a las demás páginas. También recupera el campo «Mantenimiento programado» de las reglas, que estaba oculto por lo mismo. Con una prueba nueva para que no vuelva a pasar.
 
