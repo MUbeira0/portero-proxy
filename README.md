@@ -251,3 +251,9 @@ fn on_request(req, cfg) {
 - Backend con `"canary": { "server": "nuevo", "percent": 10, "sticky": true, "auto_rollback": true, "max_error_percent": 20 }`: ese servidor recibe solo ese porcentaje; `X-Portero-Canary: 1` lo fuerza y `0` lo evita. Con `auto_rollback` se retira solo (hasta volver a aplicar la configuración) si da ≥ `max_error_percent` % de 5xx en al menos 20 peticiones de una ventana de 5 minutos.
 - **Historial**: `GET /api/changes` y `GET /api/changes/diff?name=config-<hora>.json` comparan las copias que se guardan en `backups/` (las últimas 30); «deshacer» usa `POST /api/restore/<copia>`.
 - Tema de aviso `dns`: vigila cada 10 minutos los dominios de los sitios (`dns-watch`).
+
+### Páginas de estado: incidencias, suscripción, nodos y mantenimiento programado (Pro)
+
+- En `status_pages[]`: `accent` (`#rrggbb`), `logo_url` (`https://…`), `footer`, `subscribe` (true) e `incidents: [{ "id": "fallo-1", "title": "…", "body": "…", "kind": "info|warn|bad", "ts": 1700000000, "resolved": 1700003600, "updates": [{ "ts": …, "text": "…" }] }]`. Las caídas (≥ 2 minutos) se detectan solas. Suscripción: `POST /subscribe` (correo) → correo de confirmación → `GET /confirm?t=…`; cada aviso lleva `GET /unsubscribe?t=…`. Los suscriptores se guardan en `status-subs.json` (permisos 600).
+- Token de API con `"can_update": true` (solo rol admin): permite a otro panel pedir `POST /api/update/apply` (la contraseña y el 2FA se piden en el panel que gestiona el nodo). La página Nodos muestra las versiones nuevas.
+- Mantenimiento programado: una regla `{ "if": "host(x)", "scheduled": { "windows": ["dom 03:00-04:00"], "message": "…" } }` (hora UTC); el botón «Mantenimiento» de Sitios la crea.
