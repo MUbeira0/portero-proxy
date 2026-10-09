@@ -244,3 +244,10 @@ fn on_request(req, cfg) {
 ### Páginas de estado públicas (Pro)
 
 `"status_pages": [{ "id": "estado", "title": "Estado de mis servicios", "host": "estado.midominio.com", "notice": "", "items": [{ "label": "Fotos", "backend": "fotos", "host": "fotos.midominio.com" }] }]`. Portero sirve esa página él mismo en `host` (sin comodines; necesita DNS y certificado como cualquier sitio), antes de las reglas y sin contraseña, y además `/status.json`. Solo se publican los nombres (`label`) y los estados; nunca backends ni direcciones. Con `host` en un elemento, Portero pide cada minuto `GET path` (por defecto `/`) a ese backend con ese dominio y lo da por activo si no responde 5xx; sin `host` se usa la salud del backend. El historial (30 días) sale de `availability.log`. Sin licencia no se sirve. En el panel: página **Estado público**.
+
+### Cortafuegos web, despliegue gradual, historial y avisos de DNS (Pro)
+
+- `security.waf`: `{ "enabled": true, "mode": "detect"|"block", "level": "normal"|"high", "disabled_rules": ["xss"], "extra": ["patrón"], "exceptions": [{ "host": "wiki.midominio.com", "path_prefix": "/editor/", "rule": "xss", "comment": "…" }] }`. Revisa ruta, parámetros (también decodificados una y dos veces) y User-Agent; no lee el cuerpo. Familias: `traversal`, `sqli`, `sqli-high`, `xss`, `xss-high`, `log4shell`, `sensitive`, `cmdi`, `nullbyte`, `scanners` y `custom`. Una excepción con `rule: "*"` deja pasar todas. Página **Cortafuegos** del panel; `GET /api/waf`.
+- Backend con `"canary": { "server": "nuevo", "percent": 10, "sticky": true, "auto_rollback": true, "max_error_percent": 20 }`: ese servidor recibe solo ese porcentaje; `X-Portero-Canary: 1` lo fuerza y `0` lo evita. Con `auto_rollback` se retira solo (hasta volver a aplicar la configuración) si da ≥ `max_error_percent` % de 5xx en al menos 20 peticiones de una ventana de 5 minutos.
+- **Historial**: `GET /api/changes` y `GET /api/changes/diff?name=config-<hora>.json` comparan las copias que se guardan en `backups/` (las últimas 30); «deshacer» usa `POST /api/restore/<copia>`.
+- Tema de aviso `dns`: vigila cada 10 minutos los dominios de los sitios (`dns-watch`).
