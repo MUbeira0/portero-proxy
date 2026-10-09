@@ -1,5 +1,8 @@
 # Cambios
 
+## [0.6.7]
+- **Sitios**: selector de orden (nombre, problemas primero, más visitas, más errores), filtro «🛠 En mantenimiento» y, en cada categoría, un botón para poner o quitar el mantenimiento de todos sus sitios a la vez (con el mismo mensaje y la opción de dejar pasar la red local).
+
 ## [0.6.6]
 - **Arreglo del botón «Mantenimiento» de los sitios**: ponía la página de mantenimiento solo en la entrada HTTPS del sitio. Los sitios detrás de Cloudflare en modo Flexible entran por el puerto 80 (regla «host(x) and header(cf-visitor…)»), así que sus visitantes se la saltaban y veían el sitio normal. Ahora se añade delante de todas las reglas del sitio, en todas las entradas. Además el cuadro avisa de que, con «Dejar pasar a la red local» marcado, quien prueba desde casa sigue viendo el sitio normal.
 
