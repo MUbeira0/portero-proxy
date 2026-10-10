@@ -263,3 +263,7 @@ fn on_request(req, cfg) {
 - Con `compress: true` en una regla se responde con `br` (brotli, calidad 4) si el navegador lo admite y con `gzip` si no (se respetan los `q=`).
 - «Acceso» de un sitio = una regla `{ "if": "host(x) and not (src(203.0.113.7,198.51.100.0/24) or country(ES))", "deny": 403 }` puesta delante de las del sitio en cada entrada. «Límites» = reglas sin destino con `limit`: `{ "if": "host(x) and path_prefix(/login) and method(POST)", "limit": { "requests": 5, "per_seconds": 60 } }`; no cambian el destino.
 - Informe semanal: `"report": { "enabled": true, "day": 0, "hour": 7 }` (día 0 = lunes … 6 = domingo, hora UTC). Tema de aviso `report`. `GET /api/report/preview` y `POST /api/report/send`.
+
+### Un solo puerto (80) abierto: HTTP y HTTPS mezclados + Cloudflare «Full (strict)»
+
+Si solo puedes abrir el puerto 80 en el router: en la entrada `:80` pon `"tls": { "certs": ["tu-certificado"] }` y `"mixed": true` (los certificados son los de la entrada HTTPS). En Cloudflare: SSL/TLS → Resumen → **Full (strict)** y SSL/TLS → Reglas de origen → una regla «Reescribir puerto de destino» a **80** para tu dominio. Cloudflare habla TLS con Portero por el puerto 80 y Portero distingue por el primer byte entre ese TLS y el HTTP en claro. Los nombres que quieras públicos tienen que ir con la nube naranja.
