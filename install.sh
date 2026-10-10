@@ -158,7 +158,8 @@ if [ "$UPDATING" -eq 1 ]; then
   say "Actualizando $("$BIN" version 2>/dev/null | awk '{print $2}') → $NEWV"
   [ -f "$CONF_DIR/portero.json" ] && cp -p "$CONF_DIR/portero.json" "$CONF_DIR/portero.json.antes-de-$NEWV" 2>/dev/null || true
   # de estas copias del instalador solo se conservan las 5 más recientes (cada actualización dejaba una más)
-  ls -1t "$CONF_DIR"/portero.json.antes-de-* 2>/dev/null | tail -n +6 | while read -r old; do rm -f -- "$old"; done
+  # (por número de versión: las copias conservan la fecha del original y ordenarlas por fecha no sirve)
+  ls -1 "$CONF_DIR"/portero.json.antes-de-* 2>/dev/null | sort -V -r | tail -n +6 | while read -r old; do rm -f -- "$old"; done
   stop_service
 else
   say "Instalando Portero $NEWV"
