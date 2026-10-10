@@ -257,3 +257,9 @@ fn on_request(req, cfg) {
 - En `status_pages[]`: `accent` (`#rrggbb`), `logo_url` (`https://…`), `footer`, `subscribe` (true) e `incidents: [{ "id": "fallo-1", "title": "…", "body": "…", "kind": "info|warn|bad", "ts": 1700000000, "resolved": 1700003600, "updates": [{ "ts": …, "text": "…" }] }]`. Las caídas (≥ 2 minutos) se detectan solas. Suscripción: `POST /subscribe` (correo) → correo de confirmación → `GET /confirm?t=…`; cada aviso lleva `GET /unsubscribe?t=…`. Los suscriptores se guardan en `status-subs.json` (permisos 600).
 - Token de API con `"can_update": true` (solo rol admin): permite a otro panel pedir `POST /api/update/apply` (la contraseña y el 2FA se piden en el panel que gestiona el nodo). La página Nodos muestra las versiones nuevas.
 - Mantenimiento programado: una regla `{ "if": "host(x)", "scheduled": { "windows": ["dom 03:00-04:00"], "message": "…" } }` (hora UTC); el botón «Mantenimiento» de Sitios la crea.
+
+### Brotli, acceso por IP/país, límites por ruta e informe semanal
+
+- Con `compress: true` en una regla se responde con `br` (brotli, calidad 4) si el navegador lo admite y con `gzip` si no (se respetan los `q=`).
+- «Acceso» de un sitio = una regla `{ "if": "host(x) and not (src(203.0.113.7,198.51.100.0/24) or country(ES))", "deny": 403 }` puesta delante de las del sitio en cada entrada. «Límites» = reglas sin destino con `limit`: `{ "if": "host(x) and path_prefix(/login) and method(POST)", "limit": { "requests": 5, "per_seconds": 60 } }`; no cambian el destino.
+- Informe semanal: `"report": { "enabled": true, "day": 0, "hour": 7 }` (día 0 = lunes … 6 = domingo, hora UTC). Tema de aviso `report`. `GET /api/report/preview` y `POST /api/report/send`.
