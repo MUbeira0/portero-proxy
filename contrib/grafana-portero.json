@@ -1,121 +1,853 @@
 {
   "__inputs": [
-    { "name": "DS_PROMETHEUS", "label": "Prometheus", "description": "El Prometheus que recoge /metrics de Portero", "type": "datasource", "pluginId": "prometheus", "pluginName": "Prometheus" }
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "El Prometheus que recoge /metrics de Portero",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
   ],
   "title": "Portero",
   "uid": "portero-panel",
-  "tags": ["portero", "proxy"],
+  "tags": [
+    "portero",
+    "proxy"
+  ],
   "timezone": "browser",
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "refresh": "30s",
-  "time": { "from": "now-6h", "to": "now" },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
   "templating": {
     "list": [
       {
-        "name": "frontend", "label": "Entrada", "type": "query", "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-        "query": "label_values(portero_frontend_requests_total, frontend)", "refresh": 2, "includeAll": true, "multi": true, "current": { "text": "All", "value": "$__all" }
+        "name": "frontend",
+        "label": "Entrada",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "query": "label_values(portero_frontend_requests_total, frontend)",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        }
       },
       {
-        "name": "backend", "label": "Backend", "type": "query", "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-        "query": "label_values(portero_server_up, backend)", "refresh": 2, "includeAll": true, "multi": true, "current": { "text": "All", "value": "$__all" }
+        "name": "backend",
+        "label": "Backend",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "query": "label_values(portero_server_up, backend)",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        }
       }
     ]
   },
   "panels": [
     {
-      "id": 1, "type": "stat", "title": "Portero", "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-      "targets": [{ "expr": "portero_up", "refId": "A" }],
-      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "CAÍDO", "color": "red" }, "1": { "text": "EN LÍNEA", "color": "green" } } }], "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] } } },
-      "options": { "colorMode": "background" }
-    },
-    {
-      "id": 2, "type": "stat", "title": "Tiempo en marcha", "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-      "targets": [{ "expr": "portero_uptime_seconds", "refId": "A" }],
-      "fieldConfig": { "defaults": { "unit": "s" } }
-    },
-    {
-      "id": 3, "type": "stat", "title": "Peticiones por segundo", "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-      "targets": [{ "expr": "sum(rate(portero_frontend_requests_total{frontend=~\"$frontend\"}[5m]))", "refId": "A" }],
-      "fieldConfig": { "defaults": { "unit": "reqps", "decimals": 2 } }
-    },
-    {
-      "id": 4, "type": "stat", "title": "Errores 5xx (%)", "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-      "targets": [{ "expr": "100 * sum(rate(portero_frontend_responses_total{frontend=~\"$frontend\",code=\"5xx\"}[5m])) / clamp_min(sum(rate(portero_frontend_requests_total{frontend=~\"$frontend\"}[5m])), 0.0001)", "refId": "A" }],
-      "fieldConfig": { "defaults": { "unit": "percent", "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }, { "color": "red", "value": 5 }] } } },
-      "options": { "colorMode": "value" }
-    },
-    {
-      "id": 5, "type": "stat", "title": "Servidores caídos", "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-      "targets": [{ "expr": "count(portero_server_up{backend=~\"$backend\"} == 0) or vector(0)", "refId": "A" }],
-      "fieldConfig": { "defaults": { "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } } },
-      "options": { "colorMode": "background" }
-    },
-    {
-      "id": 6, "type": "stat", "title": "Conexiones activas", "gridPos": { "h": 4, "w": 4, "x": 20, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-      "targets": [{ "expr": "sum(portero_frontend_active{frontend=~\"$frontend\"})", "refId": "A" }]
-    },
-    {
-      "id": 7, "type": "timeseries", "title": "Peticiones por segundo y entrada", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-      "targets": [{ "expr": "sum by (frontend) (rate(portero_frontend_requests_total{frontend=~\"$frontend\"}[5m]))", "legendFormat": "{{frontend}}", "refId": "A" }],
-      "fieldConfig": { "defaults": { "unit": "reqps" } }
-    },
-    {
-      "id": 8, "type": "timeseries", "title": "Respuestas por tipo", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-      "targets": [{ "expr": "sum by (code) (rate(portero_frontend_responses_total{frontend=~\"$frontend\"}[5m]))", "legendFormat": "{{code}}", "refId": "A" }],
-      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [
-        { "matcher": { "id": "byName", "options": "5xx" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }] },
-        { "matcher": { "id": "byName", "options": "4xx" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "orange" } }] },
-        { "matcher": { "id": "byName", "options": "2xx" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } }] }
-      ] }
-    },
-    {
-      "id": 9, "type": "timeseries", "title": "Tráfico (bits por segundo)", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "id": 1,
+      "type": "stat",
+      "title": "Portero",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
       "targets": [
-        { "expr": "8 * sum(rate(portero_frontend_bytes_in_total{frontend=~\"$frontend\"}[5m]))", "legendFormat": "recibido", "refId": "A" },
-        { "expr": "8 * sum(rate(portero_frontend_bytes_out_total{frontend=~\"$frontend\"}[5m]))", "legendFormat": "enviado", "refId": "B" }
+        {
+          "expr": "portero_up",
+          "refId": "A"
+        }
       ],
-      "fieldConfig": { "defaults": { "unit": "bps" } }
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "CAÍDO",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "EN LÍNEA",
+                  "color": "green"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background"
+      }
     },
     {
-      "id": 10, "type": "timeseries", "title": "Bloqueos y límites por segundo", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "id": 2,
+      "type": "stat",
+      "title": "Tiempo en marcha",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
       "targets": [
-        { "expr": "sum(rate(portero_frontend_denied_total{frontend=~\"$frontend\"}[5m]))", "legendFormat": "denegadas", "refId": "A" },
-        { "expr": "sum(rate(portero_frontend_rate_limited_total{frontend=~\"$frontend\"}[5m]))", "legendFormat": "limitadas", "refId": "B" }
+        {
+          "expr": "portero_uptime_seconds",
+          "refId": "A"
+        }
       ],
-      "fieldConfig": { "defaults": { "unit": "ops" } }
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      }
     },
     {
-      "id": 11, "type": "state-timeline", "title": "Estado de cada servidor", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-      "targets": [{ "expr": "portero_server_up{backend=~\"$backend\"}", "legendFormat": "{{backend}} / {{server}}", "refId": "A" }],
-      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "caído", "color": "red" }, "1": { "text": "activo", "color": "green" } } }], "custom": { "fillOpacity": 70 } } }
-    },
-    {
-      "id": 12, "type": "timeseries", "title": "Tiempo de respuesta por servidor (ms)", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
-      "targets": [{ "expr": "portero_server_response_ms{backend=~\"$backend\"}", "legendFormat": "{{backend}} / {{server}}", "refId": "A" }],
-      "fieldConfig": { "defaults": { "unit": "ms" } }
-    },
-    {
-      "id": 13, "type": "table", "title": "Servidores", "gridPos": { "h": 8, "w": 24, "x": 0, "y": 28 },
-      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "id": 3,
+      "type": "stat",
+      "title": "Peticiones por segundo",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
       "targets": [
-        { "expr": "portero_server_up{backend=~\"$backend\"}", "format": "table", "instant": true, "refId": "A" },
-        { "expr": "portero_server_active{backend=~\"$backend\"}", "format": "table", "instant": true, "refId": "B" },
-        { "expr": "portero_server_errors_total{backend=~\"$backend\"}", "format": "table", "instant": true, "refId": "C" }
+        {
+          "expr": "sum(rate(portero_frontend_requests_total{frontend=~\"$frontend\"}[5m]))",
+          "refId": "A"
+        }
       ],
-      "transformations": [{ "id": "merge", "options": {} }, { "id": "organize", "options": { "excludeByName": { "Time": true, "job": true, "instance": true }, "renameByName": { "Value #A": "activo (1/0)", "Value #B": "conexiones", "Value #C": "errores" } } }]
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "decimals": 2
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Errores 5xx (%)",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "100 * sum(rate(portero_frontend_responses_total{frontend=~\"$frontend\",code=\"5xx\"}[5m])) / clamp_min(sum(rate(portero_frontend_requests_total{frontend=~\"$frontend\"}[5m])), 0.0001)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value"
+      }
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Servidores caídos",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "count(portero_server_up{backend=~\"$backend\"} == 0) or vector(0)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background"
+      }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Conexiones activas",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "sum(portero_frontend_active{frontend=~\"$frontend\"})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Peticiones por segundo y entrada",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "sum by (frontend) (rate(portero_frontend_requests_total{frontend=~\"$frontend\"}[5m]))",
+          "legendFormat": "{{frontend}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Respuestas por tipo",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "sum by (code) (rate(portero_frontend_responses_total{frontend=~\"$frontend\"}[5m]))",
+          "legendFormat": "{{code}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "5xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "4xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "2xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Tráfico (bits por segundo)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "8 * sum(rate(portero_frontend_bytes_in_total{frontend=~\"$frontend\"}[5m]))",
+          "legendFormat": "recibido",
+          "refId": "A"
+        },
+        {
+          "expr": "8 * sum(rate(portero_frontend_bytes_out_total{frontend=~\"$frontend\"}[5m]))",
+          "legendFormat": "enviado",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Bloqueos y límites por segundo",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(portero_frontend_denied_total{frontend=~\"$frontend\"}[5m]))",
+          "legendFormat": "denegadas",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(portero_frontend_rate_limited_total{frontend=~\"$frontend\"}[5m]))",
+          "legendFormat": "limitadas",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "type": "state-timeline",
+      "title": "Estado de cada servidor",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 20
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "portero_server_up{backend=~\"$backend\"}",
+          "legendFormat": "{{backend}} / {{server}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "caído",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "activo",
+                  "color": "green"
+                }
+              }
+            }
+          ],
+          "custom": {
+            "fillOpacity": 70
+          }
+        }
+      }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Tiempo de respuesta por servidor (ms)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 20
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "portero_server_response_ms{backend=~\"$backend\"}",
+          "legendFormat": "{{backend}} / {{server}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "id": 13,
+      "type": "table",
+      "title": "Servidores",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "portero_server_up{backend=~\"$backend\"}",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        },
+        {
+          "expr": "portero_server_active{backend=~\"$backend\"}",
+          "format": "table",
+          "instant": true,
+          "refId": "B"
+        },
+        {
+          "expr": "portero_server_errors_total{backend=~\"$backend\"}",
+          "format": "table",
+          "instant": true,
+          "refId": "C"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "job": true,
+              "instance": true
+            },
+            "renameByName": {
+              "Value #A": "activo (1/0)",
+              "Value #B": "conexiones",
+              "Value #C": "errores"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "type": "stat",
+      "title": "Certificado que caduca antes (días)",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 36
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "min(portero_cert_expiry_seconds) / 86400",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 7
+              },
+              {
+                "color": "green",
+                "value": 14
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background"
+      }
+    },
+    {
+      "id": 15,
+      "type": "stat",
+      "title": "IPs bloqueadas ahora",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 36
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "portero_bans_active",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 20
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background"
+      }
+    },
+    {
+      "id": 16,
+      "type": "stat",
+      "title": "Modo ataque",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 36
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "portero_attack_mode_active",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "apagado",
+                  "color": "green"
+                },
+                "1": {
+                  "text": "ACTIVO",
+                  "color": "red"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background"
+      }
+    },
+    {
+      "id": 17,
+      "type": "stat",
+      "title": "Versión de Portero",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 36
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "portero_build_info",
+          "refId": "A",
+          "legendFormat": "{{version}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {}
+      },
+      "options": {
+        "colorMode": "none",
+        "textMode": "name"
+      }
+    },
+    {
+      "id": 18,
+      "type": "timeseries",
+      "title": "Cortafuegos web (peticiones por segundo)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "sum by (action) (rate(portero_waf_requests_total[5m]))",
+          "refId": "A",
+          "legendFormat": "{{action}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {}
+      }
+    },
+    {
+      "id": 19,
+      "type": "timeseries",
+      "title": "Días que le quedan a cada certificado",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 40
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "portero_cert_expiry_seconds / 86400",
+          "refId": "A",
+          "legendFormat": "{{cert}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        }
+      }
+    },
+    {
+      "id": 20,
+      "type": "state-timeline",
+      "title": "Servicios de las páginas de estado",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "portero_status_item_up",
+          "refId": "A",
+          "legendFormat": "{{page}} · {{item}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {}
+      }
+    },
+    {
+      "id": 21,
+      "type": "timeseries",
+      "title": "Disponibilidad de las últimas 24 h",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 48
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "expr": "portero_status_item_uptime_ratio_24h",
+          "refId": "A",
+          "legendFormat": "{{page}} · {{item}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        }
+      }
     }
   ]
 }

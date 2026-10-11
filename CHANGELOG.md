@@ -1,5 +1,9 @@
 # Cambios
 
+## [0.10.1]
+- **Métricas de Prometheus ampliadas** (`/metrics`): versión (`portero_build_info`), conexiones, segundos que le quedan a cada certificado, peticiones del cortafuegos web (bloqueadas y solo avisadas), IPs bloqueadas, modo ataque activo y estado y disponibilidad de los servicios de las páginas de estado. Con `# HELP` y `# TYPE`. El panel de Grafana (`contrib/grafana-portero.json`) gana ocho paneles con ellas.
+- Un icono de la interfaz (certificados de cliente) no se veía en Windows 10: cambiado.
+
 ## [0.10.0]
 - **Inicio de sesión único (SSO) con OpenID Connect (Pro, apagado por defecto)**: pon delante de cualquier sitio el inicio de sesión de Authentik, Keycloak, Authelia, Google, Microsoft… Se añade el proveedor en Seguridad → Inicio de sesión único y se elige en la regla del sitio. Flujo de código con PKCE, descubrimiento automático, firma del id_token comprobada con las claves del proveedor (RS256 y ES256), emisor, destinatario, caducidad y nonce verificados, estado ligado al navegador, acceso por correo (`ana@casa.lan`, `@casa.lan`) o por grupo, y el servidor recibe quién es en la cabecera `X-Portero-User`. Sin licencia, un sitio con SSO se cierra del todo.
 - **Certificados de cliente (mTLS) (Pro, apagado por defecto)**: una entrada HTTPS puede pedir certificado al visitante (opcional u obligatorio). Portero trae su propia CA de clientes (emite certificados desde Seguridad, con revocación inmediata mediante una lista CRL) o usas la tuya (archivo PEM). Nueva condición `client_cert()` / `client_cert(ana,luis)` para exigirlo solo en algunos sitios, y el nombre del certificado llega al servidor en `X-Portero-Client-CN`. No se combina con HTTP/3.
