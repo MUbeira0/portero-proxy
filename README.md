@@ -267,3 +267,11 @@ fn on_request(req, cfg) {
 ### Un solo puerto (80) abierto: HTTP y HTTPS mezclados + Cloudflare «Full (strict)»
 
 Si solo puedes abrir el puerto 80 en el router: en la entrada `:80` pon `"tls": { "certs": ["tu-certificado"] }` y `"mixed": true` (los certificados son los de la entrada HTTPS). En Cloudflare: SSL/TLS → Resumen → **Full (strict)** y SSL/TLS → Reglas de origen → una regla «Reescribir puerto de destino» a **80** para tu dominio. Cloudflare habla TLS con Portero por el puerto 80 y Portero distingue por el primer byte entre ese TLS y el HTTP en claro. Los nombres que quieras públicos tienen que ir con la nube naranja.
+
+### Canales ntfy/Gotify/Pushover/Slack, páginas de error, insignias, registro a Loki/syslog y configuración como código
+
+- Canales (`notifications.channels[]`): `{"kind":"ntfy","url":"https://ntfy.sh/mi-tema","token":"(opcional)"}`, `{"kind":"gotify","url":"http://host:8080","token":"app"}`, `{"kind":"pushover","token":"app","user_key":"usuario"}`, `{"kind":"slack","url":"https://hooks.slack.com/…"}`.
+- `error_pages: [{ "host": "*.midominio.com", "status": [502,503,504], "title": "…", "message": "…", "html": "<h1>{codigo}</h1>" }]`: sustituye las páginas que genera Portero (Pro).
+- Insignias de una página de estado: `https://estado.midominio.com/badge.svg`, `/badge/<sitio>.svg`, `/badge/<sitio>/uptime.svg?d=7d`.
+- `logging.syslog: { "addr": "192.168.1.20:514", "tcp": false }`, `logging.loki: { "url": "http://loki:3100", "user": "", "password": "", "labels": { "host": "portero1" } }`, `logging.ship: ["access","event","audit"]` (vacío = todo) (Pro). Panel de Grafana en `contrib/grafana-portero.json`.
+- CLI: `portero export -c portero.json > git/portero.json`, `portero diff -f git/portero.json -c portero.json`, `portero apply -f git/portero.json -c portero.json [--dry-run]`.

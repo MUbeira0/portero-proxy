@@ -165,6 +165,8 @@ else
   say "Instalando Portero $NEWV"
 fi
 
+# copia de la versión anterior por si la nueva no arranca (se restaura sola)
+[ "$UPDATING" -eq 1 ] && cp -p "$BIN" "$BIN.prev" 2>/dev/null || true
 install -m 755 "$NEW_BIN" "$BIN"
 
 if ! id "$SVC_USER" >/dev/null 2>&1; then
@@ -259,6 +261,32 @@ for _ in $(seq 1 40); do
   sleep 0.25
 done
 systemctl is-active --quiet portero || { journalctl -u portero -n 20 --no-pager >&2 || true; die "El servicio no arrancó; mira: journalctl -u portero"; }
+
+# al actualizar: el servicio tiene que seguir activo y el panel contestar; si no, se vuelve a la versión anterior
+panel_ok() {
+  command -v curl >/dev/null 2>&1 || return 0
+  local b port
+  b="$(awk '/"admin"/{f=1} f&&/"bind"/{print; exit}' "$CONF_DIR/portero.json" 2>/dev/null)"
+  port="$(echo "$b" | sed -n 's/.*:\([0-9][0-9]*\)".*/\1/p')"
+  [ -n "$port" ] || return 0
+  curl -fsS -m 3 -o /dev/null "http://127.0.0.1:$port/health" 2>/dev/null || curl -fsSk -m 3 -o /dev/null "https://127.0.0.1:$port/health" 2>/dev/null
+}
+if [ "$UPDATING" -eq 1 ] && [ -x "$BIN.prev" ] && [ -z "${PORTERO_SKIP_CHECK:-}" ]; then
+  say "Comprobando que la versión nueva responde…"
+  good=0
+  for _ in $(seq 1 25); do
+    sleep 2
+    if systemctl is-active --quiet portero && panel_ok; then good=$((good + 1)); [ "$good" -ge 3 ] && break; else good=0; fi
+  done
+  if [ "$good" -lt 3 ]; then
+    warn "La versión $NEWV no responde: vuelvo a la anterior."
+    systemctl stop portero 2>/dev/null || true
+    mv -f "$BIN.prev" "$BIN"
+    systemctl restart portero || true
+    journalctl -u portero -n 15 --no-pager >&2 || true
+    die "Actualización revertida: sigue funcionando la versión anterior. Mira el registro de arriba."
+  fi
+fi
 
 echo
 if [ -f "$CONF_DIR/setup-token" ]; then
