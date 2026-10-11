@@ -289,3 +289,10 @@ Si solo puedes abrir el puerto 80 en el router: en la entrada `:80` pon `"tls": 
 - HTTP/2 / gRPC: `{ "name": "grpc", "addr": "10.0.0.5:50051", "h2": true }` en un servidor del backend (con `"tls": true` se negocia por ALPN, si no es HTTP/2 en claro). Usa la comprobación de salud `tcp`.
 
 - Métricas: `GET /metrics` en el panel (Basic con una cuenta del panel, o un token de API) para Prometheus: peticiones y respuestas por entrada, estado y tiempos por servidor, `portero_build_info`, `portero_cert_expiry_seconds`, `portero_waf_requests_total`, `portero_bans_active`, `portero_attack_mode_active` y `portero_status_item_up`. Panel de Grafana listo en `contrib/grafana-portero.json`.
+
+### Aplicar con red de seguridad, despertar sitios, sincronizar Porteros y picos de tráfico (Pro, apagados por defecto)
+
+- Red de seguridad: `PUT /api/config?safe=60` aplica y deja 60 s (15 a 600) para `POST /api/apply/confirm`; si no llega, se restaura la configuración anterior (`GET /api/apply/pending` dice cuánto queda, `POST /api/apply/revert` la deshace ya).
+- Despertar: `proxmox: [{ "name": "pve", "url": "https://192.168.1.2:8006", "node": "pve", "token_id": "root@pam!portero", "token_secret": "…" }]` y en un backend `"wake": { "host": "pve", "kind": "lxc", "vmid": 105, "idle_minutes": 30, "message": "Encendiendo…" }` (`kind` lxc o qemu; `idle_minutes` admite decimales y 0 = no apagar nunca). El token necesita `VM.PowerMgmt`. Usa una comprobación de salud TCP. `GET /api/wake` y `POST /api/wake/<backend>/start|stop`.
+- Sincronizar: `"sync": { "nodes": ["pve"], "sections": ["autoban", "waf", "geoip", "spike", "error_pages", "report", "bans"], "auto": true }` (los nodos son los de `nodes`); `POST /api/sync/run` lo lanza ya.
+- Picos: `"security": { "spike": { "enabled": true, "factor": 5, "min_rpm": 120, "interval_secs": 60, "warmup_minutes": 180, "auto_attack_minutes": 0 } }`; avisa por el tema «seguridad».

@@ -1,5 +1,12 @@
 # Cambios
 
+## [0.11.0]
+- **Cartel de cambios nuevo**: ahora flota abajo y se ve siempre mientras haya algo sin aplicar, con un solo botón **Aplicar** (más «Ver cambios» y «Descartar»). Se acabó el paso extra de «Validar»: al aplicar ya se comprueba todo.
+- **Red de seguridad al aplicar**: marca «Red de seguridad (60 s)» en el cartel y, tras aplicar, tienes un minuto para confirmar que sigues entrando; si no lo confirmas, Portero vuelve solo a la configuración anterior (también hay «Deshacer ahora»). Si te equivocas en las redes permitidas o en un puerto, no te quedas fuera. Se avisa por tus canales cuando se deshace solo. Por API: `PUT /api/config?safe=60`, `POST /api/apply/confirm` y `/api/apply/revert`.
+- **Sitios que se despiertan solos (Pro, apagado por defecto)**: un backend puede apuntar a un contenedor o máquina de Proxmox. Cuando llega una visita y está apagado, Portero lo enciende (el visitante ve una página «despertando…» que se actualiza sola) y lo apaga tras los minutos sin tráfico que elijas (con conexiones en curso no lo apaga). Se configura en Servidores → 🖧 Proxmox (token de API, guardado cifrado) y en el editor del backend; en la tarjeta del backend se ve si está despierto o dormido y hay botones para despertarlo o dormirlo a mano.
+- **Sincronizar Porteros (Pro, apagado por defecto)**: en Nodos eliges a qué Porteros copiar y qué ajustes (bloqueo automático, cortafuegos, países, picos de tráfico, páginas de error, informe semanal e IPs bloqueadas), a mano o solo cuando algo cambie. Nunca viajan contraseñas, tokens ni certificados, y cada Portero conserva sus sitios y sus cuentas.
+- **Aviso de picos de tráfico (Pro, apagado por defecto)**: Portero aprende cuántas peticiones por minuto recibes a cada hora de la semana y te avisa cuando durante 3 minutos seguidos entra mucho más (por defecto 5 veces lo normal, y nunca por debajo de 120 por minuto). Opcionalmente activa solo el modo ataque unos minutos.
+
 ## [0.10.1]
 - **Métricas de Prometheus ampliadas** (`/metrics`): versión (`portero_build_info`), conexiones, segundos que le quedan a cada certificado, peticiones del cortafuegos web (bloqueadas y solo avisadas), IPs bloqueadas, modo ataque activo y estado y disponibilidad de los servicios de las páginas de estado. Con `# HELP` y `# TYPE`. El panel de Grafana (`contrib/grafana-portero.json`) gana ocho paneles con ellas.
 - Un icono de la interfaz (certificados de cliente) no se veía en Windows 10: cambiado.
