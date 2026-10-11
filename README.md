@@ -275,3 +275,9 @@ Si solo puedes abrir el puerto 80 en el router: en la entrada `:80` pon `"tls": 
 - Insignias de una página de estado: `https://estado.midominio.com/badge.svg`, `/badge/<sitio>.svg`, `/badge/<sitio>/uptime.svg?d=7d`.
 - `logging.syslog: { "addr": "192.168.1.20:514", "tcp": false }`, `logging.loki: { "url": "http://loki:3100", "user": "", "password": "", "labels": { "host": "portero1" } }`, `logging.ship: ["access","event","audit"]` (vacío = todo) (Pro). Panel de Grafana en `contrib/grafana-portero.json`.
 - CLI: `portero export -c portero.json > git/portero.json`, `portero diff -f git/portero.json -c portero.json`, `portero apply -f git/portero.json -c portero.json [--dry-run]`.
+
+### Modo ataque y proxy UDP (Pro, apagados por defecto)
+
+- `security.attack: { "enabled": true, "until": 1790000000, "hosts": ["*.midominio.com"], "challenge": true, "strict": false, "waf": true, "per_ip_per_min": 120 }`: mientras `enabled` sea verdadero y no haya pasado `until` (Unix, 0 = sin fin), quien abre una página en un navegador debe resolver una comprobación automática (cookie `portero_ok` ligada a su IP), cada IP tiene un límite de peticiones por minuto, el cortafuegos web trabaja en nivel alto bloqueando y el bloqueo automático de IPs se vuelve más sensible. `strict` exige la cookie también a lo que no es un navegador. No afecta a la red local, a las IPs de confianza ni al panel. También se activa con un botón en Seguridad.
+- Entrada UDP: `{ "name": "wg", "bind": "0.0.0.0:51820", "mode": "udp", "default_backend": "wireguard", "client_timeout_secs": 60, "rules": [] }`. Cada cliente tiene su sesión hacia el backend, que se cierra tras `client_timeout_secs` sin tráfico; las reglas pueden usar `src(...)`/`country(...)` con `deny`. No admite TLS ni redirecciones.
+- Las actualizaciones (instalador y botón del panel) comprueban que la versión nueva responde y, si no, restauran la anterior (`PORTERO_SKIP_CHECK=1` desactiva la comprobación del instalador).

@@ -265,11 +265,13 @@ systemctl is-active --quiet portero || { journalctl -u portero -n 20 --no-pager 
 # al actualizar: el servicio tiene que seguir activo y el panel contestar; si no, se vuelve a la versión anterior
 panel_ok() {
   command -v curl >/dev/null 2>&1 || return 0
-  local b port
+  local b port host
   b="$(awk '/"admin"/{f=1} f&&/"bind"/{print; exit}' "$CONF_DIR/portero.json" 2>/dev/null)"
   port="$(echo "$b" | sed -n 's/.*:\([0-9][0-9]*\)".*/\1/p')"
+  host="$(echo "$b" | sed -n 's/.*"\([^"]*\):[0-9][0-9]*".*/\1/p')"
+  case "$host" in ""|0.0.0.0|"[::]"|"::") host=127.0.0.1 ;; esac
   [ -n "$port" ] || return 0
-  curl -fsS -m 3 -o /dev/null "http://127.0.0.1:$port/health" 2>/dev/null || curl -fsSk -m 3 -o /dev/null "https://127.0.0.1:$port/health" 2>/dev/null
+  curl -fsS -m 3 -o /dev/null "http://$host:$port/health" 2>/dev/null || curl -fsSk -m 3 -o /dev/null "https://$host:$port/health" 2>/dev/null
 }
 if [ "$UPDATING" -eq 1 ] && [ -x "$BIN.prev" ] && [ -z "${PORTERO_SKIP_CHECK:-}" ]; then
   say "Comprobando que la versión nueva responde…"

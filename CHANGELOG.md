@@ -1,5 +1,47 @@
 # Cambios
 
+## [0.9.1]
+- **Modo ataque (Pro, apagado por defecto)**: un botón en Seguridad para cuando te inundan de peticiones. Mientras está activo: comprobación automática del navegador (prueba de trabajo de unos segundos, cookie ligada a la IP) para quien abre páginas, límite de peticiones por IP, cortafuegos web en nivel alto bloqueando y bloqueo automático de IPs más sensible. Puedes limitarlo a ciertos sitios, hacerlo estricto (también exige la comprobación a lo que no es un navegador) y elegir la duración; se apaga solo. Nunca afecta a la red local, a las IPs de confianza ni al panel.
+- **Proxy UDP (Pro)**: una entrada en modo `udp` reenvía datagramas (juegos, WireGuard, DNS…) a un backend: una sesión por cliente, se cierra por inactividad, admite reglas por IP y cuenta tráfico.
+- **Actualizaciones más seguras**: el instalador y el actualizador del panel comprueban que la versión nueva arranca y que el panel contesta (en la dirección real donde escucha) y, si no, vuelven solos a la anterior.
+
+## [0.9.0]
+- **Canales de aviso nuevos**: ntfy, Gotify, Pushover y Slack, además de correo, Telegram, Discord y webhook.
+- **Páginas de error propias (Pro)**: HTML propio para los 404/502/503… por sitio.
+- **Insignias de estado**: `/badge.svg` y `/badge/<sitio>.svg` en las páginas de estado, para pegarlas en un README.
+- **Envío de registros**: syslog (UDP/TCP, RFC 5424) y Grafana Loki, con una plantilla de panel en `contrib/grafana-portero.json`.
+- **Configuración como código**: `portero export`, `portero diff` y `portero apply`.
+
+## [0.8.2]
+- Las páginas de estado crean y mantienen solas sus registros DNS (y el certificado) en la red.
+
+## [0.8.1]
+- Las páginas de estado crean el DNS por defecto y muestran su estado.
+
+## [0.8.0]
+- **HTTP y HTTPS en el mismo puerto** (`mixed`): una entrada detecta si lo que llega es TLS o HTTP plano. Sirve cuando solo puedes abrir un puerto (80) y Cloudflare entra en Full (strict). Páginas de estado con DNS y certificado automáticos.
+
+## [0.7.5]
+- El instalador conserva por versión las 5 copias de configuración más nuevas.
+
+## [0.7.4]
+- Revisión general: ajustes del cortafuegos web, canario, baja de suscriptores de las páginas de estado, menú de Sitios y dependencias.
+
+## [0.7.3]
+- **Brotli**, **lista de IPs o países permitidos por sitio**, **límites de peticiones por ruta** e **informe semanal** por tus canales de aviso.
+
+## [0.7.2]
+- Páginas de estado con incidencias y suscripción por correo, mantenimiento programado en Sitios y actualización de nodos desde el panel.
+
+## [0.7.1]
+- **Cortafuegos web** (detectar o bloquear, familias de reglas y excepciones), **despliegue gradual (canario)** de servidores, **historial de cambios** de la configuración y avisos de cambios de DNS.
+
+## [0.7.0]
+- Compresión gzip y cabecera Cache-Control por regla; favoritos y acciones en bloque en Sitios.
+
+## [0.6.8]
+- Páginas de estado públicas y arreglo del diseño de tablas en dos columnas.
+
 ## [0.6.7]
 - **Sitios**: selector de orden (nombre, problemas primero, más visitas, más errores), filtro «🛠 En mantenimiento» y, en cada categoría, un botón para poner o quitar el mantenimiento de todos sus sitios a la vez (con el mismo mensaje y la opción de dejar pasar la red local).
 
