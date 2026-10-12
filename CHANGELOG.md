@@ -1,5 +1,9 @@
 # Cambios
 
+## [0.11.1]
+- **Despertar bajo demanda**: una máquina que Portero apaga a propósito por inactividad (o a mano desde el panel) ya no cuenta como caída: no manda avisos de «servidor caído» ni «backend sin servidores» y no ensucia la disponibilidad de las páginas de estado. Al arrancar Portero se mira qué máquinas ya duermen para tratarlas igual.
+- **Arreglo**: usar un destino HTTPS «sin comprobar el certificado» (Nodos con esa opción, Proxmox) hacía fallar una tarea interna por un detalle de ALPN; corregido.
+
 ## [0.11.0]
 - **Cartel de cambios nuevo**: ahora flota abajo y se ve siempre mientras haya algo sin aplicar, con un solo botón **Aplicar** (más «Ver cambios» y «Descartar»). Se acabó el paso extra de «Validar»: al aplicar ya se comprueba todo.
 - **Red de seguridad al aplicar**: marca «Red de seguridad (60 s)» en el cartel y, tras aplicar, tienes un minuto para confirmar que sigues entrando; si no lo confirmas, Portero vuelve solo a la configuración anterior (también hay «Deshacer ahora»). Si te equivocas en las redes permitidas o en un puerto, no te quedas fuera. Se avisa por tus canales cuando se deshace solo. Por API: `PUT /api/config?safe=60`, `POST /api/apply/confirm` y `/api/apply/revert`.
