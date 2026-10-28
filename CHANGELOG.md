@@ -1,5 +1,8 @@
 # Cambios
 
+## [0.11.2]
+- **Seguridad**: actualizadas las librerías TLS y de red tras 7 avisos de seguridad de baja gravedad: `rustls` 0.23.46 (secretos TLS en los `Debug`, datos tras un rechazo de ECH, bajada a intercambio de claves clásico, descompresión brotli de certificados que Portero no usa), `rustls-webpki` 0.103.16 (intermedios de certificado desconfiados), `webpki-roots` 1.0.11 (raíces emSign desconfiadas) y `tokio` 1.54.1. Sin cambios de comportamiento.
+
 ## [0.11.1]
 - **Despertar bajo demanda**: una máquina que Portero apaga a propósito por inactividad (o a mano desde el panel) ya no cuenta como caída: no manda avisos de «servidor caído» ni «backend sin servidores» y no ensucia la disponibilidad de las páginas de estado. Al arrancar Portero se mira qué máquinas ya duermen para tratarlas igual.
 - **Arreglo**: usar un destino HTTPS «sin comprobar el certificado» (Nodos con esa opción, Proxmox) hacía fallar una tarea interna por un detalle de ALPN; corregido.
