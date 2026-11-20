@@ -9,7 +9,7 @@ By **MilServices** · Licencia: software propietario gratuito (ver LICENSE) · [
 ## Qué hace
 
 **Proxy y balanceo**
-- Modo **HTTP** (HTTP/1.1 y HTTP/2 con los clientes, WebSocket y cualquier `Upgrade`) y modo **TCP** (cualquier protocolo, con enrutado por SNI sin descifrar TLS).
+- Modo **HTTP** (HTTP/1.1 y HTTP/2 con los clientes, WebSocket y cualquier `Upgrade`) y modo **TCP** (cualquier protocolo, con enrutado por SNI sin descifrar TLS y **protocolo PROXY** v1/v2 para que el servidor vea la IP real del cliente).
 - Reglas por **dominio, ruta, método, cabecera, cookie, parámetro, IP de origen, TLS/SNI** con `and / or / not` y paréntesis:
   `host(*.casa.lan) and not path_prefix(/admin) or src(192.168.0.0/16)`.
 - Acciones: enviar a un backend, **bloquear**, **redirigir**, reescribir ruta (quitar/añadir prefijo), añadir/quitar cabeceras de petición y respuesta, **usuario y contraseña** por regla.
@@ -287,6 +287,7 @@ Si solo puedes abrir el puerto 80 en el router: en la entrada `:80` pon `"tls": 
 - `oidc_providers: [{ "name": "authentik", "issuer": "https://auth.midominio.com/application/o/portero/", "client_id": "…", "client_secret": "…", "allowed_emails": ["@midominio.com"], "allowed_groups": ["familia"] }]` y en una regla `"oidc": "authentik"`. Registra en el proveedor la dirección de retorno `https://tu-sitio/__portero/oidc/callback`. Con las dos listas vacías entra cualquier cuenta del proveedor. El servidor recibe `X-Portero-User` (el correo). `redirect_scheme`, `scopes`, `groups_claim`, `require_verified_email` y `session_hours` son opcionales.
 - mTLS: en `tls` de una entrada, `"client_ca": "internal"` (la CA de clientes de Portero; emite certificados en Seguridad) o la ruta de un PEM, y `"client_auth": "optional" | "required"`. Con `optional`, las reglas deciden con `client_cert()` o `client_cert(ana)`: `host(admin.midominio.com) and not client_cert()` → bloquear. El nombre llega al servidor en `X-Portero-Client-CN`. Revocar un certificado lo deja fuera en seguida. Para instalarlo en un móvil: `openssl pkcs12 -export -out ana.p12 -inkey ana.key -in ana.crt`.
 - HTTP/2 / gRPC: `{ "name": "grpc", "addr": "10.0.0.5:50051", "h2": true }` en un servidor del backend (con `"tls": true` se negocia por ALPN, si no es HTTP/2 en claro). Usa la comprobación de salud `tcp`.
+- Protocolo PROXY (entradas TCP, gratis): `{ "name": "correo", "addr": "10.0.0.8:10993", "proxy_protocol": "v1" }` (o `"v2"`, binario) en un servidor del backend. Al conectar, Portero le manda la IP y el puerto reales del cliente; el servidor tiene que esperarlo en ese puerto (Dovecot `haproxy = yes` con `haproxy_trusted_networks`, Postfix `smtpd_upstream_proxy_protocol = haproxy`, Nginx `listen … proxy_protocol`, HAProxy `accept-proxy`). No se combina con `tls` ni `h2` hacia el servidor ni con backends que use una entrada HTTP. Limita ese puerto del servidor a la IP de Portero: si no, cualquiera podría falsear su IP.
 
 - Métricas: `GET /metrics` en el panel (Basic con una cuenta del panel, o un token de API) para Prometheus: peticiones y respuestas por entrada, estado y tiempos por servidor, `portero_build_info`, `portero_cert_expiry_seconds`, `portero_waf_requests_total`, `portero_bans_active`, `portero_attack_mode_active` y `portero_status_item_up`. Panel de Grafana listo en `contrib/grafana-portero.json`.
 
