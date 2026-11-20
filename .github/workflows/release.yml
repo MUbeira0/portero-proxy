@@ -15,12 +15,13 @@ jobs:
       matrix:
         include:
           - arch: x86_64
-            runner: ubuntu-latest
+            # ubuntu-26.04 compila el C (curvas de ring/aws-lc) para x86-64-v3 (AVX2/BMI2) por defecto
+            # y el binario muere con SIGILL en CPUs anteriores a Haswell: imagen fija y base x86-64.
+            runner: ubuntu-24.04
             target: x86_64-unknown-linux-musl
             docker: amd64
-            # Rust 1.100 compila por defecto para CPUs con AVX2/BMI2 (x86-64-v3) y el binario
-            # muere con SIGILL en procesadores anteriores a Haswell: se fija la base x86-64.
             cpu: "-C target-cpu=x86-64"
+            cflags: "-march=x86-64 -mtune=generic"
           - arch: aarch64
             runner: ubuntu-24.04-arm
             target: aarch64-unknown-linux-musl
@@ -48,11 +49,19 @@ jobs:
         working-directory: src
         env:
           RUSTFLAGS: "-A warnings --remap-path-prefix=${{ github.workspace }}/src=/build ${{ matrix.cpu }}"
+          CFLAGS: ${{ matrix.cflags }}
         run: |
           if ! cargo build --release --locked --target ${{ matrix.target }} >/dev/null 2>&1; then
             echo "::error::La compilación falló (el registro se oculta porque el código es privado; reprodúcelo en el repositorio privado)"
             exit 1
           fi
+      - name: Comprobar que sirve para CPUs x86_64 antiguas
+        if: matrix.arch == 'x86_64'
+        run: |
+          # Las rutas con BMI2 que se eligen en tiempo de ejecución suman unas 400; con 3000 el código común ya las exige (SIGILL en CPUs sin AVX2).
+          N="$(objdump -d --no-show-raw-insn "src/target/${{ matrix.target }}/release/portero" | grep -cE '\b(mulx|shlx|sarx|shrx|rorx|pdep|pext) ')"
+          echo "instrucciones BMI2: $N"
+          [ "$N" -lt 1000 ] || { echo "::error::El binario exige BMI2/AVX2 ($N instrucciones): no arrancaría en CPUs anteriores a 2013"; exit 1; }
       - name: Empaquetar
         run: |
           VERSION="${GITHUB_REF_NAME#v}"

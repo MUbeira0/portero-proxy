@@ -1,5 +1,8 @@
 # Cambios
 
+## [0.12.2]
+- **Arreglo de verdad** del fallo de la 0.12.0: el problema no era el compilador de Rust sino la imagen de compilación (Ubuntu 26.04), cuyo compilador de C genera instrucciones AVX2/BMI2 en el código de curvas elípticas de TLS. En CPUs anteriores a 2013 Portero se cerraba al arrancar con TLS (el actualizador volvía solo a la versión anterior). La 0.12.1 seguía igual. Ahora se compila en Ubuntu 24.04 y para x86-64 básico, y se comprueba antes de publicar.
+
 ## [0.12.1]
 - **Arreglo**: el binario x86_64 de la 0.12.0 no arrancaba en procesadores sin AVX2 (Intel anteriores a Haswell, de 2013, y algunos AMD antiguos): la versión nueva del compilador generaba instrucciones que esas CPU no tienen. El actualizador lo detectaba y volvía solo a la versión anterior. Ahora se compila para cualquier x86_64. Sin otros cambios.
 
