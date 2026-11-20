@@ -1,5 +1,8 @@
 # Cambios
 
+## [0.12.1]
+- **Arreglo**: el binario x86_64 de la 0.12.0 no arrancaba en procesadores sin AVX2 (Intel anteriores a Haswell, de 2013, y algunos AMD antiguos): la versión nueva del compilador generaba instrucciones que esas CPU no tienen. El actualizador lo detectaba y volvía solo a la versión anterior. Ahora se compila para cualquier x86_64. Sin otros cambios.
+
 ## [0.12.0]
 - **Protocolo PROXY en modo TCP**: en cada servidor de un backend puedes elegir «PROXY v1» (texto) o «v2» (binario). Al conectar, Portero le manda la IP y el puerto reales del cliente, así el servidor (Postfix, Dovecot, Nginx, HAProxy…) ve quién se conecta de verdad en vez de ver a Portero: sus registros, límites y bloqueos (fail2ban) funcionan por cliente. Se elige en el editor del backend (columna «PROXY») o con `"proxy_protocol": "v1"` en la configuración. No se combina con HTTPS ni HTTP/2 hacia el servidor, ni con backends que use una entrada HTTP (se avisa al aplicar). Ojo: limita ese puerto del servidor a la IP de Portero.
 
